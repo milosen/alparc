@@ -21,13 +21,13 @@ EXAMPLE_EXTERNAL_LEXICON_PATH = get_data_path("example_external_lexicon.txt")
 
 # german corpus constants
 GERMAN_CORPUS_PATH = get_data_path("german")
-SYLLABLES_DEFAULT_PATH_DEU_SPECIAL = GERMAN_CORPUS_PATH / 'syll.txt'
-IPA_BIGRAMS_DEFAULT_PATH = GERMAN_CORPUS_PATH / 'ipa_bigrams_german.csv'
-IPA_TRIGRAMS_DEFAULT_PATH = GERMAN_CORPUS_PATH / 'ipa_trigrams_german.csv'
-IPA_SEG_DEFAULT_PATH = GERMAN_CORPUS_PATH / 'german_IPA_seg.csv'
+GERMAN_SYLLABLE_FREQUENCIES_PATH = GERMAN_CORPUS_PATH / 'syllable_frequency.txt'
+GERMAN_IPA_BIGRAMS_PATH = GERMAN_CORPUS_PATH / 'ipa_bigrams_german.csv'
+GERMAN_IPA_TRIGRAMS_PATH = GERMAN_CORPUS_PATH / 'ipa_trigrams_german.csv'
+GERMAN_IPA_SEG_PATH = GERMAN_CORPUS_PATH / 'german_IPA_seg.csv'
 
-#CORPUS_DEFAULT_PATH_CELEX = get_data_path("CELEX")
-#SYLLABLES_DEFAULT_PATH_ENG = CORPUS_DEFAULT_PATH_CELEX / "ENGLISH" / "EFS" / "EFS.CD"
+ENGLISH_CORPUS_PATH = get_data_path("english")
+SYLLABLES_DEFAULT_PATH_ENG = ENGLISH_CORPUS_PATH / "syllable_frequency.cd"
 
 RESULTS_DEFAULT_PATH = pathlib.Path("arc_results")
 SSML_RESULTS_DEFAULT_PATH = RESULTS_DEFAULT_PATH / "syllables"
