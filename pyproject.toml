@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+arpac = ["data/*"]
+
+[project]
+name = "arpac"
+version = "0.0.1"
+authors = [
+  { name="Nikola Milosevic", email="milose.nik@gmail.com" },
+  { name="Lorenzo Titone"},
+]
+description = "Artificial languages with rhythmicity, phonological, and acoustic controls"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "click",
+]
+
+[project.urls]
+Homepage = "https://github.com/pypa/sampleproject"
+Issues = "https://github.com/pypa/sampleproject/issues"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+
+[project.scripts]
+arpac = "arpac:cli.cli"
