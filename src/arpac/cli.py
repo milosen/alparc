@@ -14,11 +14,6 @@ ARPAC_WORKSPACE = "arpac_workspace"
 logger = logging.getLogger(__name__)
 
 
-def open_file_in_browser(file_path: str):
-    import webbrowser
-    webbrowser.open('file://' + os.path.realpath(file_path))
-
-
 def write_out_streams(streams: Register, save_path: str, open_in_browser: bool = True):
     FILE_NAME = "results.json"
 
@@ -42,11 +37,6 @@ def write_out_streams(streams: Register, save_path: str, open_in_browser: bool =
             }
         results["info"] = streams.info
         json.dump(results, file)
-
-    if open_in_browser:
-        open_file_in_browser(os.path.join(save_path, FILE_NAME))
-        # from filebrowser.app import server
-        # server("127.0.0.1", 8080, save_path)
 
 
 def setup_logging(workspace_path: str):
@@ -73,7 +63,6 @@ def cli():
 @click.option('--lexicon', type=str, default="lexicon.txt", help="Name of text file containing the lexicon. ARPAC will look for it in the 'workspace' directory.")
 @click.option('--workspace', type=click.Path(), default=ARPAC_WORKSPACE, help="Write all results and checkpoints.")
 @click.option('--ssml/--no-ssml', type=bool, default=True, help="Export syllables to SSML.")
-@click.option('--open-browser/--no-open-browser', type=bool, default=True, help="Display results json in default browser.")
 def evaluate_lexicon(
     lexicon: str,
     workspace: str,
@@ -116,15 +105,11 @@ def evaluate_lexicon(
     phonemes_with_corpus_stats.save(os.path.join(workspace_path, "phonemes_with_corpus_stats.json"))
     logger.info(f"Phonemes object with corpus stats saved to file: {os.path.join(workspace_path, 'phonemes_with_corpus_stats.json')}")
 
-    if open_browser:
-        open_file_in_browser(save_path)
-
 
 @cli.command(help="Evaluate existing stream.")
 @click.option('--stream', type=str, default="stream.txt", help="Name of text file containing the stream. ARPAC will look for it in the 'workspace' directory.")
 @click.option('--workspace', type=click.Path(), default=ARPAC_WORKSPACE, help="Write all results and checkpoints.")
 @click.option('--ssml/--no-ssml', type=bool, default=True, help="Export syllables to SSML.")
-@click.option('--open-browser/--no-open-browser', type=bool, default=True, help="Display results json in default browser.")
 def evaluate_stream(
     stream: str,
     workspace: str,
@@ -168,14 +153,9 @@ def evaluate_stream(
     logger.info(f"Phonemes object with corpus stats saved to file: {os.path.join(workspace_path, 'phonemes_with_corpus_stats.json')}")
 
 
-    if open_browser:
-        open_file_in_browser(save_path)
-
-
 @cli.command(help="Generate new lexicons and syllable streams.")
 @click.option('--workspace', type=click.Path(), default=ARPAC_WORKSPACE, help="Write all results and checkpoint here.")
 @click.option('--ssml/--no-ssml', type=bool, default=True, help="Export syllables to SSML.")
-@click.option('--open-browser/--no-open-browser', type=bool, default=True, help="Display results json in default browser.")
 def generate(
     workspace: str,
     ssml: bool,

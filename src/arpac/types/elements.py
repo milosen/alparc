@@ -32,12 +32,6 @@ class Element(ABC):
     @abstractmethod
     def get_elements(self):
         pass
-    
-    def flatten(self):
-        register_builder = RegisterBuilder()
-        for sub_element in self.get_elements():
-            register_builder.add_item(sub_element)
-        return register_builder.build()
 
 
 class Phoneme(Element, BaseModel):

@@ -3,35 +3,14 @@ from abc import ABC, abstractmethod
 from collections import OrderedDict
 from copy import copy
 from os import PathLike
-from typing import Dict, Any, TypeVar, Union
+from typing import Dict, Any, Type, TypeVar, Union
+
+import pandas as pd
 
 from arpac.controls.common import *
+from arpac.types.elements import Element
 
 RegisterType = TypeVar("RegisterType", bound="Register")
-
-
-class Element(ABC):
-    id: str
-    info: Dict[str, Any]
-
-    def __getitem__(self, item):
-        return self.get_elements()[item]
-
-    def __iter__(self):
-        return iter(self.get_elements())
-
-    def __str__(self):
-        return self.id
-
-    @abstractmethod
-    def get_elements(self):
-        pass
-    
-    def flatten(self) -> RegisterType:
-        reg = Register({})
-        for sub_element in self.get_elements():
-            reg.append(sub_element)
-        return reg
 
 
 class Register(OrderedDict):

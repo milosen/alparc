@@ -32,15 +32,15 @@ def get_data_path(fname):
 BINARY_FEATURES_DEFAULT_PATH = get_data_path("phonemes.csv")
 PHONEMES_DEFAULT_PATH = get_data_path("phonemes.json")
 
-CORPUS_DEFAULT_PATH_DEU_SPECIAL = get_data_path("example_corpus")
-SYLLABLES_DEFAULT_PATH_DEU_SPECIAL = CORPUS_DEFAULT_PATH_DEU_SPECIAL / 'syll.txt'
-IPA_BIGRAMS_DEFAULT_PATH = CORPUS_DEFAULT_PATH_DEU_SPECIAL / 'ipa_bigrams_german.csv'
-IPA_TRIGRAMS_DEFAULT_PATH = CORPUS_DEFAULT_PATH_DEU_SPECIAL / 'ipa_trigrams_german.csv'
-IPA_SEG_DEFAULT_PATH = CORPUS_DEFAULT_PATH_DEU_SPECIAL / 'german_IPA_seg.csv'
+CORPUS_DEFAULT_PATH_DEU_SPECIAL = get_data_path("german")
+SYLLABLES_DEFAULT_PATH_DEU_SPECIAL = CORPUS_DEFAULT_PATH_DEU_SPECIAL / 'syllables.csv'
+IPA_BIGRAMS_DEFAULT_PATH = CORPUS_DEFAULT_PATH_DEU_SPECIAL / 'bigrams.csv'
+IPA_TRIGRAMS_DEFAULT_PATH = CORPUS_DEFAULT_PATH_DEU_SPECIAL / 'trigrams.csv'
+IPA_SEG_DEFAULT_PATH = CORPUS_DEFAULT_PATH_DEU_SPECIAL / 'unigrams.csv'
 
-CORPUS_DEFAULT_PATH_CELEX = get_data_path("CELEX")
-SYLLABLES_DEFAULT_PATH_ENG = CORPUS_DEFAULT_PATH_CELEX / "ENGLISH" / "EFS" / "EFS.CD"
-SYLLABLES_DEFAULT_PATH_DEU = CORPUS_DEFAULT_PATH_CELEX / "GERMAN" / "EFS" / "EFS.CD"
+CORPUS_DEFAULT_PATH_CELEX = get_data_path("english")
+SYLLABLES_DEFAULT_PATH_ENG = CORPUS_DEFAULT_PATH_CELEX / "syllables.csv"
+#SYLLABLES_DEFAULT_PATH_DEU = CORPUS_DEFAULT_PATH_CELEX / "GERMAN" / "EFS" / "EFS.CD"
 # SYLLABLES_DEFAULT_PATH_NLD = CORPUS_DEFAULT_PATH_CELEX / "DUTCH" / "EFS" / "EFS.CD"
 
 RESULTS_DEFAULT_PATH = pathlib.Path("arc_results")
@@ -77,17 +77,16 @@ def read_phoneme_corpus(
     """
     logger.info("READ ORDER OF PHONEMES IN WORDS")
     with open(ipa_seg_path, "r", encoding='utf-8') as csv_file:
-        fdata = list(csv.reader(csv_file, delimiter='\t'))
+        fdata = list(csv.reader(csv_file))[1:]
+
     phonemes = {}
-    for phon_data in fdata[1:]:
-        phon_data_split = phon_data[0].split(",")
-        if len(phon_data_split) == 3:
-            phon = phon_data_split[1].replace('"', '').replace("g", "ɡ")
-            position_in_word = int(phon_data_split[2])
-            if phon in phonemes:
-                phonemes[phon].info["order"].append(position_in_word)
-            else:
-                phonemes[phon] = Phoneme(id=phon, info={"order": [position_in_word]})
+    for phon, position_in_word in fdata:
+        phon = phon.replace('"', '').replace("g", "ɡ")
+        position_in_word = int(position_in_word)
+        if phon in phonemes:
+            phonemes[phon].info["order"].append(position_in_word)
+        else:
+            phonemes[phon] = Phoneme(id=phon, info={"order": [position_in_word]})
 
     for phon in phonemes:
         positions = max(phonemes[phon].info["order"])
@@ -110,20 +109,24 @@ def syll_to_ipa(syll, language="deu", from_format="xsampa"):
 
 
 def read_syllables_corpus(
-        syllables_corpus_path: Union[os.PathLike, str] = SYLLABLES_DEFAULT_PATH_DEU_SPECIAL,
-        from_format: Literal["ipa", "xsampa"] = "xsampa",
         lang: str = "deu",
 ) -> Register[str, Syllable]:
     logger.info("READ SYLLABLES, FREQUENCIES AND PROBABILITIES FROM CORPUS AND CONVERT SYLLABLES TO IPA")
 
+    if lang == "deu":
+        syllables_corpus_path: Union[os.PathLike, str] = SYLLABLES_DEFAULT_PATH_DEU_SPECIAL
+    elif lang == "eng":
+        syllables_corpus_path: Union[os.PathLike, str] = SYLLABLES_DEFAULT_PATH_ENG
+    else:
+        raise ValueError(f"Language {lang} not supported.")
+    
     with open(syllables_corpus_path, "r", encoding='utf-8') as csv_file:
-        fdata = list(csv.reader(csv_file, delimiter='\t'))
+        data = list(csv.reader(csv_file))[1:]
 
     syllables_dict: Dict[str, Syllable] = {}
 
-    for syll_stats in fdata[1:]:
-        syll_ipa = syll_to_ipa(syll_stats[1])
-        info = {"freq": int(syll_stats[2]), "prob": float(syll_stats[3])}
+    for syll_ipa, freq, prob in data:
+        info = {"freq": int(freq), "prob": float(prob)}
         if syll_ipa not in syllables_dict or syllables_dict[syll_ipa].info != info:
             syllables_dict[syll_ipa] = Syllable(
                 id=syll_ipa, phonemes=[], info=info, binary_features=[], phonotactic_features=[])
@@ -131,7 +134,6 @@ def read_syllables_corpus(
             logger.info(
                 f"Syllable '{syll_ipa}' with conflicting stats {info} != {syllables_dict[syll_ipa].info}."
             )
-            # del syllables_dict[syll_ipa]
 
     return Register(syllables_dict)
 
@@ -142,17 +144,16 @@ def read_bigrams(
     logger.info("READ BIGRAMS")
 
     with open(ipa_bigrams_path, "r", encoding='utf-8') as csv_file:
-        fdata = list(csv.reader(csv_file, delimiter='\t'))
+        fdata = list(csv.reader(csv_file))[1:]
 
-    freqs = [int(data[0].split(",")[2]) for data in fdata[1:]]
+    freqs = [int(data[1]) for data in fdata]
     p_vals_uniform = stats.uniform.sf(abs(stats.zscore(np.log(freqs))))
 
     bigrams_dict: Dict[str, Syllable] = {}
 
-    for bigram_stats, p_unif in zip(fdata[1:], p_vals_uniform):
-        bigram_stats = bigram_stats[0].split(",")
-        bigram = bigram_stats[1].replace('_', '').replace("g", "ɡ")
-        info = {"freq": int(bigram_stats[2]), "p_unif": p_unif}
+    for (bigram, freq), p_unif in zip(fdata, p_vals_uniform):
+        bigram = bigram.replace('_', '').replace("g", "ɡ")
+        info = {"freq": int(freq), "p_unif": p_unif}
 
         if bigram not in bigrams_dict or bigrams_dict[bigram].info == info:
             # a bigram is not necessarily a syllable but in our type system they are equivalent
@@ -170,29 +171,29 @@ def read_trigrams(
         ipa_trigrams_path: str = IPA_TRIGRAMS_DEFAULT_PATH,
 ) -> Register[str, Syllable]:
     logger.info("READ TRIGRAMS")
-    fdata = list(csv.reader(open(ipa_trigrams_path, "r", encoding='utf-8'), delimiter='\t'))
+    
+    with open(ipa_trigrams_path, "r", encoding='utf-8') as csv_file:
+        fdata = list(csv.reader(csv_file))[1:]
 
-    freqs = [int(data[0].split(",")[1]) for data in fdata[1:]]
-    p_uniform = stats.uniform.sf(abs(stats.zscore(np.log(freqs))))
+    freqs = [int(data[1]) for data in fdata]
+    p_vals_uniform = stats.uniform.sf(abs(stats.zscore(np.log(freqs))))
 
-    trigrams_dict: Dict[str, Syllable] = {}
-    for data, p_unif in zip(fdata[1:], p_uniform):
-        data = data[0].split(",")
-        trigram = data[0].replace('_', '').replace("g", "ɡ")
-        info = {"freq": int(data[1]), "p_unif": p_unif}
+    trigrams = Register()
+    for (trigram, freq), p_unif in zip(fdata[1:], p_vals_uniform):
+        trigram = trigram.replace('_', '').replace("g", "ɡ")
+        info = {"freq": int(freq), "p_unif": p_unif}
 
-        if trigram not in trigrams_dict or trigrams_dict[trigram].info == info:
-            trigrams_dict[trigram] = Syllable(id=trigram, phonemes=[], info=info)
+        if trigram not in trigrams or trigrams[trigram].info == info:
+            trigrams[trigram] = Syllable(id=trigram, phonemes=[], info=info)
         else:
             logger.info(
-                f"Trigram '{trigram}' with conflicting stats {info} != {trigrams_dict[trigram].info}."
+                f"Trigram '{trigram}' with conflicting stats {info} != {trigrams[trigram].info}."
             )
-            # del trigrams_dict[trigram]
 
-    return Register(trigrams_dict)
+    return trigrams
 
 
-def read_phonemes_csv(binary_features_path: str = BINARY_FEATURES_DEFAULT_PATH) -> Register:
+def read_default_phonemes(binary_features_path: str = BINARY_FEATURES_DEFAULT_PATH) -> Register:
     logger.info("READ MATRIX OF BINARY FEATURES FOR ALL IPA PHONEMES")
 
     with open(binary_features_path, "r", encoding='utf-8') as csv_file:
@@ -246,10 +247,6 @@ def check_german(words: List[Word]):
     return words
 
 
-def load_default_phonemes():
-    return read_phonemes_csv()
-
-
 def arc_register_from_json(path: Union[str, PathLike], arc_type: Type) -> RegisterType:
     """
     Load an arc register from a json file.
@@ -273,7 +270,7 @@ def load_phonemes(language_control: bool = True) -> RegisterType:
     Returns:
         RegisterType: _description_
     """
-    phonemes = load_default_phonemes()
+    phonemes = read_default_phonemes()
     
     if language_control:
         phonemes = phonemes.intersection(read_phoneme_corpus())
