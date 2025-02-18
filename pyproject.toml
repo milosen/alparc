@@ -24,6 +24,8 @@ classifiers = [
 ]
 dependencies = [
   "click",
+  "pingouin",
+  "pydantic",
 ]
 
 [project.urls]

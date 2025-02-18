@@ -136,7 +136,6 @@ def make_syllables(phonemes: RegisterType, phoneme_pattern: str = "cV",
                    unigram_control: bool = True,
                    language_control: bool = True, 
                    language_alpha: Optional[float] = 0.05,
-                   from_format: Literal["ipa", "xsampa"] = "xsampa",
                    lang: str = "deu") -> RegisterType:
     """_summary_
 
@@ -155,14 +154,14 @@ def make_syllables(phonemes: RegisterType, phoneme_pattern: str = "cV",
 
     syllables = make_feature_syllables(phonemes, phoneme_pattern=phoneme_pattern)
 
-    if language_control:
-        german_syllable_corpus = read_syllables_corpus(from_format=from_format, lang=lang)
+    if language_control and lang == "deu":
+        german_syllable_corpus = read_syllables_corpus(lang=lang)
         syllables = syllables.intersection(german_syllable_corpus)
     
         if language_alpha is not None:
             syllables = filter_uniform_syllables(syllables, alpha=language_alpha)
     
-    if unigram_control:
+    if unigram_control and lang == "deu":
         syllables = filter_common_phoneme_syllables(syllables)
 
     return syllables

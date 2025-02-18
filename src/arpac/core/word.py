@@ -97,6 +97,7 @@ def make_words(syllables: RegisterType,
                n_words=10_000,
                max_tries=100_000,
                progress_bar: bool = True,
+               lang="deu"
                ) -> RegisterType:
     """_summary_
 
@@ -126,15 +127,15 @@ def make_words(syllables: RegisterType,
 
     words_register.info["syllables_info"] = copy(syllables.info)
 
-    if bigram_control:
+    if bigram_control and lang=="deu":
         logger.info("bigram control...")
         words_register = filter_bigrams(words_register, p_val=bigram_alpha)
 
-    if trigram_control:
+    if trigram_control and lang=="deu":
         logger.info("trigram control...")
         words_register = filter_trigrams(words_register, p_val=trigram_alpha)
 
-    if positional_control:
+    if positional_control and lang=="deu":
         logger.info("positional control...")
         words_register = filter_common_phoneme_words(words_register, p_threshold=position_alpha, position=positional_control_position)
 

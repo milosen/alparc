@@ -67,7 +67,6 @@ def evaluate_lexicon(
     lexicon: str,
     workspace: str,
     ssml: bool,
-    open_browser: bool
 ):
     workspace_path = setup_workspace(workspace, name="arpac_eval_lexicon_out")
     setup_logging(workspace_path)
@@ -114,7 +113,6 @@ def evaluate_stream(
     stream: str,
     workspace: str,
     ssml: bool,
-    open_browser: bool
 ):
     workspace_path = setup_workspace(workspace, name="arpac_eval_stream_out")
     setup_logging(workspace_path)
@@ -159,7 +157,6 @@ def evaluate_stream(
 def generate(
     workspace: str,
     ssml: bool,
-    open_browser: bool,
 ):
     workspace_path = setup_workspace(workspace, name="arpac_generate_out")
     setup_logging(workspace_path)
