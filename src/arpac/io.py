@@ -66,7 +66,7 @@ def export_speech_synthesizer(syllables: Iterable[Syllable],
 
 
 def read_phoneme_corpus(
-        ipa_seg_path: Union[os.PathLike, str] = IPA_SEG_DEFAULT_PATH
+        lang: Literal["deu", "eng"] = "eng",
 ) -> Register[str, Phoneme]:
     """
     Read order of phonemes, i.e. phonemes from a corpus together with the positions at which they
@@ -75,7 +75,15 @@ def read_phoneme_corpus(
     :param ipa_seg_path:
     :return:
     """
+    if not (lang == "deu"):
+        logger.warning("Only german phoneme corpus available")
+        return read_default_phonemes()
+
     logger.info("READ ORDER OF PHONEMES IN WORDS")
+
+    # TODO: make language specific
+    ipa_seg_path: Union[os.PathLike, str] = IPA_SEG_DEFAULT_PATH
+
     with open(ipa_seg_path, "r", encoding='utf-8') as csv_file:
         fdata = list(csv.reader(csv_file))[1:]
 
@@ -193,10 +201,10 @@ def read_trigrams(
     return trigrams
 
 
-def read_default_phonemes(binary_features_path: str = BINARY_FEATURES_DEFAULT_PATH) -> Register:
+def read_default_phonemes() -> Register:
     logger.info("READ MATRIX OF BINARY FEATURES FOR ALL IPA PHONEMES")
 
-    with open(binary_features_path, "r", encoding='utf-8') as csv_file:
+    with open(BINARY_FEATURES_DEFAULT_PATH, "r", encoding='utf-8') as csv_file:
         fdata = list(csv.reader(csv_file))
 
     phons = [row[0] for row in fdata[1:]]
@@ -261,7 +269,7 @@ def arc_register_from_json(path: Union[str, PathLike], arc_type: Type) -> Regist
     return register
 
 
-def load_phonemes(language_control: bool = True) -> RegisterType:
+def load_phonemes(lang: Optional[Literal["deu", "eng"]] = "deu") -> RegisterType:
     """Load phoneme corpus with phonological features.
 
     Args:
@@ -272,8 +280,8 @@ def load_phonemes(language_control: bool = True) -> RegisterType:
     """
     phonemes = read_default_phonemes()
     
-    if language_control:
-        phonemes = phonemes.intersection(read_phoneme_corpus())
+    if lang is not None:
+        phonemes = phonemes.intersection(read_phoneme_corpus(lang=lang))
 
     return phonemes
 
@@ -288,3 +296,6 @@ def load_words(path_to_json: Union[str, PathLike]):
 
 def load_lexicons(path_to_json: Union[str, PathLike]):
     return arc_register_from_json(path_to_json, LexiconType)
+
+def load_streams(path_to_json: Union[str, PathLike]):
+    return arc_register_from_json(path_to_json, Stream)

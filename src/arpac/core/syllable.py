@@ -7,7 +7,7 @@ from typing import List, Literal, Optional, Union, TypeVar, Dict, Any
 from pydantic import BaseModel
 
 from arpac.types.base_types import Register, RegisterType
-from arpac.types.phoneme import Phoneme
+from arpac.types.phoneme import Phoneme, TypePhonemeFeatureLabels
 from arpac.types.base_types import Element
 from arpac.types.syllable import Syllable, SyllableType, LABELS_C, LABELS_V
 
@@ -74,6 +74,8 @@ def make_feature_syllables(
     phonemes: RegisterType,
     phoneme_pattern: Union[str, list] = "cV",
     max_combinations: int = 1_000_000,
+    consonant_features: List[TypePhonemeFeatureLabels] = LABELS_C,
+    vowel_features: List[TypePhonemeFeatureLabels] = LABELS_V,
 ) -> RegisterType:
     """Generate syllables form feature-phonemes. Only keep syllables that follow the phoneme pattern"""
 
@@ -90,7 +92,7 @@ def make_feature_syllables(
 
     logger.info(f"Search for phoneme-pattern '{''.join(phoneme_types)}'")
 
-    labels_mapping = {"c": LABELS_C, "C": LABELS_C, "v": LABELS_V, "V": LABELS_V}
+    labels_mapping = {"c": consonant_features, "C": consonant_features, "v": vowel_features, "V": vowel_features}
     syll_feature_labels = list(map(lambda t: labels_mapping[t], phoneme_types))
 
     single_consonants, multi_consonants, short_vowels, long_vowels = [], [], [], []
@@ -133,10 +135,12 @@ def make_feature_syllables(
 
 
 def make_syllables(phonemes: RegisterType, phoneme_pattern: str = "cV",
-                   unigram_control: bool = True,
-                   language_control: bool = True, 
-                   language_alpha: Optional[float] = 0.05,
-                   lang: str = "deu") -> RegisterType:
+                   #unigram_control: bool = True,
+                   syllable_control: bool = True, 
+                   syllable_alpha: Optional[float] = 0.05,
+                   lang: str = "deu",
+                   consonant_features: List[TypePhonemeFeatureLabels] = LABELS_C,
+                   vowel_features: List[TypePhonemeFeatureLabels] = LABELS_V,) -> RegisterType:
     """_summary_
 
     Args:
@@ -152,16 +156,19 @@ def make_syllables(phonemes: RegisterType, phoneme_pattern: str = "cV",
         RegisterType: The final Register of syllables
     """
 
-    syllables = make_feature_syllables(phonemes, phoneme_pattern=phoneme_pattern)
+    syllables = make_feature_syllables(phonemes, 
+                                       phoneme_pattern=phoneme_pattern,
+                                       consonant_features=consonant_features,
+                                       vowel_features=vowel_features)
 
-    if language_control and lang == "deu":
-        german_syllable_corpus = read_syllables_corpus(lang=lang)
-        syllables = syllables.intersection(german_syllable_corpus)
+    if syllable_control:
+        syllable_corpus = read_syllables_corpus(lang=lang)
+        syllables = syllables.intersection(syllable_corpus)
     
-        if language_alpha is not None:
-            syllables = filter_uniform_syllables(syllables, alpha=language_alpha)
+        if syllable_alpha is not None:
+            syllables = filter_uniform_syllables(syllables, alpha=syllable_alpha)
     
-    if unigram_control and lang == "deu":
-        syllables = filter_common_phoneme_syllables(syllables)
+    #if unigram_control and lang == "deu":
+    #    syllables = filter_common_phoneme_syllables(syllables)
 
     return syllables

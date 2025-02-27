@@ -20,7 +20,7 @@ class Stream(Element, BaseModel):
         return self.syllables
         
     def __str__(self):
-        return "|".join(syllable.id for syllable in self)
+        return "_".join([syll.id for syll in self.syllables[:5]]) + "..." + "_".join([syll.id for syll in self.syllables[-5:]])
     
     def save(self, path: Union[str, PathLike] = None):
         if path is None:

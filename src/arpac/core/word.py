@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from tqdm import tqdm
 
 from arpac.types.base_types import Register, Element, RegisterType
+from arpac.types.phoneme import PHONEME_FEATURE_LABELS, TypePhonemeFeatureLabels
 from arpac.types.syllable import Syllable, SyllableType
 from arpac.types.word import Word, WordType
 
@@ -33,19 +34,29 @@ def generate_subset_syllables(syllables, lookback_syllables):
     return subset
 
 
-def word_overlap_matrix(words: Register[str, Word], lag_of_interest: int = 1):
+def word_overlap_matrix(
+        words: Register[str, Word], 
+        lag_of_interest: int = 1,
+        control_features: List[TypePhonemeFeatureLabels] = PHONEME_FEATURE_LABELS):
     n_words = len(words)
     n_sylls_per_word = len(words[0].syllables)
 
     oscillation_patterns = get_oscillation_patterns(lag=(n_sylls_per_word*lag_of_interest))
 
     overlap = np.zeros([n_words, n_words], dtype=int)
+
+    feature_indexes = []
+    features = [feature for phoneme_features in words.info["syllables_info"]["syllable_feature_labels"] for feature in phoneme_features]
+    for i, feature in enumerate(features):
+        if feature in control_features:
+            feature_indexes.append(i)
+
     for i1, i2 in list(itertools.product(range(n_words), range(n_words))):
         word_pair_features = [f1 + f2 for f1, f2 in zip(words[i1].info["binary_features"],
                                                         words[i2].info["binary_features"])]
 
-        for word_pair_feature in word_pair_features:
-            if word_pair_feature in oscillation_patterns:
+        for i, word_pair_feature in enumerate(word_pair_features):
+            if (word_pair_feature in oscillation_patterns) and i in feature_indexes:
                 overlap[i1, i2] += 1
 
     return overlap

@@ -24,7 +24,7 @@ from arpac.core.syllable import LABELS_C, LABELS_V, syllable_from_phonemes
 from arpac.core.word import Word, word_overlap_matrix
 from arpac.core.stream import compute_rhythmicity_index_sylls_stream, get_oscillation_patterns
 
-ALL_DEFAULT_PHONEMES = load_phonemes(language_control=False)
+ALL_DEFAULT_PHONEMES = load_phonemes(lang=None)
 SYLLABLE_FEAT_LABELS = [LABELS_C] + [LABELS_V]
 
 def to_syllable(syllable, syllable_type="cv"):
@@ -45,6 +45,9 @@ def to_syllable(syllable, syllable_type="cv"):
         syllable_obj = syllable_from_phonemes(ALL_DEFAULT_PHONEMES, syllable[:2], SYLLABLE_FEAT_LABELS)
         syllable_obj.id = syllable
         return syllable_obj
+    
+    if is_cV:
+        return syllable_from_phonemes(ALL_DEFAULT_PHONEMES, [syllable[:-2], syllable[-2:]], SYLLABLE_FEAT_LABELS)
         
     return syllable_from_phonemes(ALL_DEFAULT_PHONEMES, syllable, SYLLABLE_FEAT_LABELS)
 

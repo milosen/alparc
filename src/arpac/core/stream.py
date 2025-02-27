@@ -1,18 +1,22 @@
 import collections
 import itertools
+import logging.config
 import math
-from typing import List, Optional, Literal, Dict
+from typing import List, Optional, Literal, Dict, Union
 import logging
+import os
 
+from arpac.io import load_phonemes
 from arpac.types.base_types import Register, RegisterType
 from arpac.types.syllable import Syllable
 from arpac.types.word import WordType, Word
 from arpac.types.lexicon import LexiconType
 from arpac.types.stream import StreamType, Stream
-
 from arpac.controls.common import get_oscillation_patterns
 
-from arpac.core.lexicon import make_lexicon_generator
+from arpac.core.lexicon import make_lexicon_generator, make_lexicons
+from arpac.core.word import make_words
+from arpac.core.syllable import make_syllables
 
 from arpac.controls.common import *
 
@@ -352,7 +356,7 @@ def make_stream_from_lexicon(lexicon: Register[str, Word],
             feature_labels = [f"phon_{i_phon+1}_{label}" for i_phon, labels in i_labels for label in labels]
 
             return Stream(
-                id="".join([syll.id for syll in sylls_stream]),
+                id="_".join([syll.id for syll in sylls_stream[:5]]) + "..." + "_".join([syll.id for syll in sylls_stream[-5:]]),
                 syllables=sylls_stream,
                 info={
                     "rhythmicity_indexes": {k: float(v) for k, v in zip(feature_labels, rhythmicity_indexes)},
@@ -396,7 +400,7 @@ def get_stream_syllable_stats(stream: StreamType) -> Dict:
 
 
 def make_streams(
-        lexicons: List[LexiconType],
+        lexicons: Optional[List[LexiconType]],
         max_rhythmicity: Optional[float] = None,
         stream_length: int = 32,
         max_tries_randomize: int = 10,

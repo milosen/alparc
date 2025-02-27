@@ -3,9 +3,12 @@ import logging
 import math
 from copy import copy
 from functools import partial
-from typing import Generator, Iterable, Set, List
+from typing import Generator, Iterable, Optional, Set, List
+
+from tqdm import tqdm
 
 from arpac.types.base_types import Register, RegisterType
+from arpac.types.phoneme import PHONEME_FEATURE_LABELS, TypePhonemeFeatureLabels
 from arpac.types.syllable import SyllableType
 from arpac.types.word import WordType, Word
 from arpac.types.lexicon import Lexicon, LexiconType
@@ -15,7 +18,6 @@ from arpac.core.word import word_overlap_matrix
 from arpac.controls.common import *
 
 logger = logging.getLogger(__name__)
-
 
 def word_as_syllable_set(word: WordType) -> Set[SyllableType]:
     return set(syllable.id for syllable in word)
@@ -37,9 +39,10 @@ def make_lexicon_generator(
         n_words: int = 4,
         max_overlap: int = 1,
         max_yields: int = 1_000_000,
-        lag_of_interest: int = 1) -> Generator[Lexicon, None, None]:
+        lag_of_interest: int = 1,
+        control_features: List[TypePhonemeFeatureLabels] = PHONEME_FEATURE_LABELS,) -> Generator[Lexicon, None, None]:
 
-    overlap = word_overlap_matrix(words, lag_of_interest=lag_of_interest)
+    overlap = word_overlap_matrix(words, lag_of_interest=lag_of_interest, control_features=control_features)
     options = dict((k, v) for k, v in locals().items() if not k == 'words' and not k == 'overlap')
     logger.info(f"GENERATE MIN OVERLAP LEXICONS WITH OPTIONS {options}")
     yields = 0
@@ -137,7 +140,9 @@ def make_lexicons(
     lag_of_interest: int = 1,
     max_word_matrix: int = 200,
     unique_words: bool = False,
-    control_features: bool = True
+    binary_feature_control: bool = True,
+    progress_bar: bool = False,
+    control_features: List[TypePhonemeFeatureLabels] = PHONEME_FEATURE_LABELS,
 ) -> List[Lexicon]:
     """_summary_
 
@@ -149,7 +154,7 @@ def make_lexicons(
         lag_of_interest (int, optional): the frequency of the word features for which a feature is consideret 'overlapping'. 1 means the feature frequency is the number of syllables in 1 word. Defaults to 1.
         max_word_matrix (int, optional): How many words to use maximum (subsample if nessesary) to generate the feature overlap matrix. Defaults to 200.
         unique_words (bool, optional): check uniqueness of words across all lexicons. Defaults to False.
-        control_features (bool, optional): control feature overlap between words in the lexicon. If false lexicons will be generated completely at random. Defaults to True.
+        binary_feature_control (bool): control feature overlap between words in the lexicon. If false lexicons will be generated completely at random. Defaults to True.
 
     Returns:
         List[Lexicon]: A List of Lexicons
@@ -157,12 +162,16 @@ def make_lexicons(
 
     lexicons = []
 
-    if control_features:
+    if progress_bar:
+        pbar = tqdm(total=n_lexicons)
+
+    if binary_feature_control:
         lexicon_generator = make_lexicon_generator(
             words.get_subset(max_word_matrix),
             n_words=n_words,
             max_overlap=max_overlap,
-            lag_of_interest=lag_of_interest
+            lag_of_interest=lag_of_interest,
+            control_features=control_features,
         )
     else:
         lexicon_generator: Iterable = sample_random_lexicon(
@@ -182,6 +191,7 @@ def make_lexicons(
 
         if not has_repeating_words:
             lexicons.append(lexicon)
+            pbar.update(1)
 
         if len(lexicons) >= n_lexicons:
             break

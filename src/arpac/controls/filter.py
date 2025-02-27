@@ -28,9 +28,9 @@ def filter_uniform_syllables(syllables: Register[str, Syllable], alpha: float = 
                     _info=copy(syllables.info))
 
 
-def filter_common_phoneme_syllables(syllables, ipa_seg_path: Union[str, PathLike] = IPA_SEG_DEFAULT_PATH):
+def filter_common_phoneme_syllables(syllables, lang="deu"):
     logger.info("Filter syllables with common/native phonemes.")
-    native_phonemes = read_phoneme_corpus(ipa_seg_path=ipa_seg_path)
+    native_phonemes = read_phoneme_corpus(lang=lang)
 
     def is_native(syllable):
         return all((phoneme.id in native_phonemes) for phoneme in syllable)
