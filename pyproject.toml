@@ -23,7 +23,10 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-  "click",
+  "tyro",
+  "tqdm",
+  "seaborn",
+  "ruamel_yaml",
   "pingouin",
   "pydantic",
 ]
