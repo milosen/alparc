@@ -49,8 +49,8 @@
 #     pickle.dump(fdata, f, pickle.HIGHEST_PROTOCOL)
 
 # LOAD INCREMENTAL TP MATRIX FOR ALL STREAMS
-indir = project_dir + '01_Stimuli/03_Streams/'
-fname = indir + 'Incremental_TPs.pickle'
-with open(fname, 'rb') as f:
-   fdata = pickle.load(f)
-Incremental_TPs = fdata
+#indir = project_dir + '01_Stimuli/03_Streams/'
+#fname = indir + 'Incremental_TPs.pickle'
+#with open(fname, 'rb') as f:
+#   fdata = pickle.load(f)
+#Incremental_TPs = fdata
