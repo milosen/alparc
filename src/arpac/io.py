@@ -19,7 +19,7 @@ from arpac.types.base_types import Register, RegisterType
 from arpac.types.phoneme import PHONEME_FEATURE_LABELS, Phoneme
 from arpac.types.syllable import Syllable
 from arpac.types.word import Word
-from arpac.types.lexicon import LexiconType
+from arpac.types.lexicon import Lexicon, LexiconType
 from arpac.types.stream import Stream
 
 logger = logging.getLogger(__name__)
@@ -293,9 +293,16 @@ def load_syllables(path_to_json: Union[str, PathLike]):
 def load_words(path_to_json: Union[str, PathLike]):
     return arc_register_from_json(path_to_json, Word)
 
-
 def load_lexicons(path_to_json: Union[str, PathLike]):
     return arc_register_from_json(path_to_json, LexiconType)
 
 def load_streams(path_to_json: Union[str, PathLike]):
-    return arc_register_from_json(path_to_json, Stream)
+    register = arc_register_from_json(path_to_json, Stream)
+    #for stream in register:
+    #    if "lexicon" in stream.info.keys():
+    #        data = stream.info["lexicon"]
+    #        print(data)
+    #        lexicon = Lexicon({k: Word(**v) for k, v in data.items() if k != "info"})
+    #        lexicon.info = data["info"]
+    #        stream.info["lexicon"] = lexicon
+    return register

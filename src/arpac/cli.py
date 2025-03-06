@@ -1,6 +1,7 @@
 import collections
 from dataclasses import dataclass, field
 import datetime
+from functools import partial
 import itertools
 import logging.config
 import math
@@ -55,13 +56,14 @@ def write_stream_summary(streams: Register, save_path: str, logger: logging.Logg
         results = {"streams": {}, "info": {}}
         results["streams"] = [{
                 "stream_full": "|".join([syllable.id for syllable in stream]),
-                "lexicon": "|".join([word.id for word in stream.info["lexicon"]]),
+                "lexicon": stream.info["lexicon"],
+                "lexicon_info": stream.info["lexicon_info"],
                 "rhythmicity_indexes": stream.info["rhythmicity_indexes"],
                 "stream_tp_mode": stream.info["stream_tp_mode"],
-                "n_syllables_per_word": stream.info["n_syllables_per_word"],
-                "n_look_back": stream.info["n_look_back"],
-                "phonotactic_control": stream.info["phonotactic_control"],
-                "syllables_info": stream.info["syllables_info"],
+                "n_syllables_per_word": stream.info["n_syllables_per_word"] if "n_syllables_per_word" in stream.info.keys() else None,
+                "n_look_back": stream.info["n_look_back"] if "n_look_back" in stream.info.keys() else None,
+                "phonotactic_control": stream.info["phonotactic_control"] if "phonotactic_control" in stream.info.keys() else None,
+                "syllables_info": stream.info["syllables_info"] if "syllables_info" in stream.info.keys() else None,
         } for stream in streams]
         for stream in streams:
             logger.info(f"- {stream.id}")
@@ -87,7 +89,7 @@ class SyllableArgs:
     unigram_control: bool = True
     unigram_alpha: Optional[float] = None
     syllable_control: bool = True
-    syllable_alpha: Optional[float] = 0.05
+    syllable_alpha: Optional[float] = None
     export_ssml: bool = False
     consonant_features: List[TypePhonemeFeatureLabels] = field(default_factory=lambda: LABELS_C)
     vowel_features: List[TypePhonemeFeatureLabels] = field(default_factory=lambda: LABELS_V)
@@ -222,6 +224,7 @@ def generate_stream_dataset(args: GenerateStreams) -> RegisterType:
             streams.append(stream)
     
     logger.info(f"Streams: ")
+    streams.save(os.path.join(log_dir, _OBJECT_DUMP, f"streams.json"))
     write_stream_summary(streams, save_path=log_dir, logger=logger)
 
 
@@ -234,111 +237,91 @@ def write_lexicon_summary(lexicon: Register, save_path: str, logger: logging.Log
 
 
 @dataclass
-class EvaluateLexicon:
-    lexicon: str
-    """Lexicon string consisting of words and syllables. Syllables should be separated by '|' and words by '||'. Example: pi|ɾu|ta||ba|ɡo|li||to|ku|da||ɡu|haɪ|bo"""
+class EvaluateLexicons:
+    lexicons: str
+    """Lexicon string(s) consisting of words and syllables. Multiple lexicons should be separated by ' '.
+    Syllables should be separated by '|' and words by '||'. Example: pi|ɾu|ta||ba|ɡo|li||to|ku|da||ɡu|haɪ|bo"""
     common: CommonArgs
+    stream: StreamArgs
     export_ssml: bool = True
+    split_registers: bool = False
+    """Derive phoneme and syllable registers from the lexicon"""
+    generate_streams: bool = True
+    phoneme_pattern: str = "cv"
 
-def evaluate_lexicon(args: EvaluateLexicon):
+def evaluate_lexicons(args: EvaluateLexicons):
     logger, log_dir = setup_logging(args.common.log_dir, args.common.log_console, name=args.common.name or "evaluate_lexicon")
 
     with open(os.path.join(log_dir, "config.yml"), "w") as file:
         yaml.dump(vars(args), file, encoding="utf-8")
 
-    data = args.lexicon
-
-    lexicon = to_lexicon([t .split("|") for t in data.split("||")], syllable_type="cv")
+    lexicons = [[w.split("|") for w in l.split("||")] for l in args.lexicons.split(" ")]
+    lexicons = list(map(partial(to_lexicon, syllable_type=args.phoneme_pattern), lexicons))
     save_path = os.path.join(log_dir, _OBJECT_DUMP, "lexicon.json")
-    logger.info(f"Read Lexicon: {lexicon}")
-    lexicon.save(save_path)
-    logger.info(f"Lexicon object saved to file: {save_path}")
+    for lexicon in lexicons:
+            logger.info(f"Read Lexicon: {lexicon}")
+            lexicon.save(save_path)
+            logger.info(f"Lexicon object saved to file: {save_path}")
+            save_path = os.path.join(log_dir, "lexicon.yml")
+            with open(save_path, 'w') as file:
+                summary = {}
+                summary["lexicon"] = "|".join(word.id for word in lexicon)
+                summary["info"] = lexicon.info
+                yaml.dump(summary, file, encoding="utf-8")
+            logger.info(f"Lexicon summary saved to file: {save_path}")
 
-    save_path = os.path.join(log_dir, "lexicon.yml")
-    with open(save_path, 'w') as file:
-        summary = {}
-        summary["lexicon"] = "|".join(word.id for word in lexicon)
-        summary["info"] = lexicon.info
-        yaml.dump(summary, file, encoding="utf-8")
-    logger.info(f"Lexicon summary saved to file: {save_path}")
+    if args.generate_streams:
+        logger.info(f"Generate Streams: ...")
+        streams = Register()
+        for _ in tqdm(range(args.stream.n_streams_per_lexicon)):
+            for stream in make_streams(
+                lexicons,
+                max_rhythmicity=args.stream.max_rhythmicity,
+                stream_length=args.stream.stream_length,
+                max_tries_randomize=args.stream.max_tries_randomize,
+                tp_modes=args.stream.tp_modes,
+                require_all_tp_modes=args.stream.require_all_tp_modes
+            ):
+                streams.append(stream)
+        
+        logger.info(f"Streams: ")
+        streams.save(os.path.join(log_dir, _OBJECT_DUMP, f"streams.json"))
+        write_stream_summary(streams, save_path=log_dir, logger=logger)
 
-    syllables = lexicon.flatten()
-    syllables.save(os.path.join(log_dir, _OBJECT_DUMP, "syllables.json"))
-    logger.info(f"Syllables object saved to file: {os.path.join(log_dir, _OBJECT_DUMP, 'syllables.json')}")
+    if args.split_registers:
+        for lexicon in lexicons:
+            syllables = lexicon.flatten()
+            syllables.save(os.path.join(log_dir, _OBJECT_DUMP, "syllables.json"))
+            logger.info(f"Syllables object saved to file: {os.path.join(log_dir, _OBJECT_DUMP, 'syllables.json')}")
 
-    syllables_with_corpus_stats = syllables.intersection(read_syllables_corpus(lang=args.common.lang))
-    syllables_with_corpus_stats.save(os.path.join(log_dir, _OBJECT_DUMP, "syllables_with_corpus_stats.json"))
-    logger.info(f"Syllables object with corpus stats saved to file: {os.path.join(log_dir, _OBJECT_DUMP, 'syllables_with_corpus_stats.json')}")
+            syllables_with_corpus_stats = syllables.intersection(read_syllables_corpus(lang=args.common.lang))
+            syllables_with_corpus_stats.save(os.path.join(log_dir, _OBJECT_DUMP, "syllables_with_corpus_stats.json"))
+            logger.info(f"Syllables object with corpus stats saved to file: {os.path.join(log_dir, _OBJECT_DUMP, 'syllables_with_corpus_stats.json')}")
 
-    if args.export_ssml:
-        from arpac.io import export_speech_synthesizer
-        export_speech_synthesizer(syllables, syllables_dir=os.path.join(log_dir, "ssml"))
+            if args.export_ssml:
+                from arpac.io import export_speech_synthesizer
+                export_speech_synthesizer(syllables, syllables_dir=os.path.join(log_dir, "ssml"))
 
-    phonemes = syllables.flatten()
-    phonemes.save(os.path.join(log_dir, _OBJECT_DUMP, "phonemes.json"))
-    logger.info(f"Phonemes object saved to file: {os.path.join(log_dir, _OBJECT_DUMP, 'phonemes.json')}")
+            phonemes = syllables.flatten()
+            phonemes.save(os.path.join(log_dir, _OBJECT_DUMP, "phonemes.json"))
+            logger.info(f"Phonemes object saved to file: {os.path.join(log_dir, _OBJECT_DUMP, 'phonemes.json')}")
 
-    if args.common.lang == "deu":
-        corpus_phonemes = read_phoneme_corpus(lang=args.common.lang)
-        phonemes_with_german_corpus_stats = phonemes.intersection(corpus_phonemes)
-        phonemes_with_german_corpus_stats.save(os.path.join(log_dir, _OBJECT_DUMP, "phonemes_with_german_corpus_stats.json"))
-        logger.info(f"Phonemes object with corpus stats saved to file: {os.path.join(log_dir, _OBJECT_DUMP, 'phonemes_with_german_corpus_stats.json')}")
+            if args.common.lang == "deu":
+                corpus_phonemes = read_phoneme_corpus(lang=args.common.lang)
+                phonemes_with_german_corpus_stats = phonemes.intersection(corpus_phonemes)
+                phonemes_with_german_corpus_stats.save(os.path.join(log_dir, _OBJECT_DUMP, "phonemes_with_german_corpus_stats.json"))
+                logger.info(f"Phonemes object with corpus stats saved to file: {os.path.join(log_dir, _OBJECT_DUMP, 'phonemes_with_german_corpus_stats.json')}")
 
 
 @dataclass
 class EvaluateStream:
     stream: str
-    """Stream string consisting of syllables, separated by '|'. Example: pi|ɾu|ta|ba|ɡo|li|to|li|to|ku|ɾu|ta|ba|ɡo|li|to|ku|da|ɡu|ki|bo"""
+    """Stream string consisting of syllables, separated by '|'. 
+    Example: pi|ɾu|ta|ba|ɡo|li|to|li|to|ku|ɾu|ta|ba|ɡo|li|to|ku|da|ɡu|ki|bo"""
 
-
-def evaluate_stream(
-    stream: str,
-    results_dir: str,
-    ssml: bool,
-):
-    workspace_path = setup_results_dir(results_dir, name="arpac_eval_stream_out")
-    setup_logging(workspace_path)
-
-    assert os.path.exists(os.path.join(results_dir, stream)), f"No file '{stream}' found in workspace directory '{os.path.realpath(results_dir)}'."
-
-    with open(os.path.join(results_dir, stream), 'r') as file:
-        data = file.read()
-
-    stream = to_stream(data.split("|"), syllable_type="cv")
-
-    save_path = os.path.join(workspace_path, "stream.json")
-    logger.info(f"Read Stream: {stream}")
-    stream.save(save_path)
-    logger.info(f"Stream object saved to file: {save_path}")
-
-    syllables = stream.flatten()
-    syllables.save(os.path.join(workspace_path, "syllables.json"))
-    logger.info(f"Syllables object saved to file: {os.path.join(workspace_path, 'syllables.json')}")
-
-    syllables_with_corpus_stats = syllables.intersection(read_syllables_corpus())
-    syllables_with_corpus_stats.save(os.path.join(workspace_path, "syllables_with_corpus_stats.json"))
-    logger.info(f"Syllables object with corpus stats saved to file: {os.path.join(workspace_path, 'syllables_with_corpus_stats.json')}")
-
-    if ssml:
-        from arpac.io import export_speech_synthesizer
-        export_speech_synthesizer(syllables, syllables_dir=os.path.join(workspace_path, "ssml"))
-
-    phonemes = syllables.flatten()
-    phonemes.save(os.path.join(workspace_path, "phonemes.json"))
-    logger.info(f"Phonemes object saved to file: {os.path.join(workspace_path, 'phonemes.json')}")
-
-    corpus_phonemes = read_phoneme_corpus(lang="deu")
-    phonemes_with_german_corpus_stats = phonemes.intersection(corpus_phonemes)
-    phonemes_with_german_corpus_stats.save(os.path.join(workspace_path, "phonemes_with_german_corpus_stats.json"))
-    logger.info(f"Phonemes object with corpus stats saved to file: {os.path.join(workspace_path, 'phonemes_with_german_corpus_stats.json')}")
-
-
-#@click.group(help="======= ARPAC: Artificial languages with Rhythmicity, Phonotactic, and Acoustic Controls =======\n\n" 
-#                  "Arpac generates streams of syllables from an artificial language based on a natural language corpus (default: German). "
-#                  "It will also generate syllables, pseudo-words, and lexicons as byproducts of the artificial language creation.")
 def cli():
-    args = tyro.cli(Union[GenerateStreams, EvaluateLexicon])
+    args = tyro.cli(Union[GenerateStreams, EvaluateLexicons])
     if isinstance(args, GenerateStreams):
         generate_stream_dataset(args)
-    if isinstance(args, EvaluateLexicon):
-        evaluate_lexicon(args)
+    if isinstance(args, EvaluateLexicons):
+        evaluate_lexicons(args)

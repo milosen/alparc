@@ -195,5 +195,11 @@ def make_lexicons(
 
         if len(lexicons) >= n_lexicons:
             break
+    
+    if not binary_feature_control:
+        for lexicon in lexicons:
+            overlap = word_overlap_matrix(lexicon)
+            lexicon.info["cumulative_feature_repetitiveness"] = int(np.triu(overlap, 1).sum())
+            lexicon.info["max_pairwise_feature_repetitiveness"] = int(np.triu(overlap, 1).max())
 
     return lexicons

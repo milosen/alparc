@@ -302,7 +302,7 @@ def sample_syllable_randomization(
         lexicon: LexiconType,
         n_repetitions: int = 4,
         max_tries=1000,
-        tp_mode: Literal["word_structured", "position_controlled", "random"] = "word_structured") -> List[Syllable]:
+        tp_mode: Literal["word_structured", "position_controlled", "random"] = "word_structured"):
     if tp_mode == "word_structured":
         elements = [word for word in lexicon]
         rand_func = pseudo_rand_tp_struct
@@ -360,7 +360,8 @@ def make_stream_from_lexicon(lexicon: Register[str, Word],
                 syllables=sylls_stream,
                 info={
                     "rhythmicity_indexes": {k: float(v) for k, v in zip(feature_labels, rhythmicity_indexes)},
-                    "lexicon": lexicon,
+                    "lexicon": str(lexicon),
+                    "lexicon_info": lexicon.info,
                     "stream_tp_mode": tp_mode,
                     **lexicon.info,
                 }
