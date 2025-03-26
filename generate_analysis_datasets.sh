@@ -1,9 +1,9 @@
 #!/bin/bash
 
-arpac generate-streams --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10  --syllable.syllable_alpha 0.5 --common.name "default_german"
+arpac generate-streams --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10  --syllable.syllable_alpha 0.05 --common.name "default_german"
 arpac generate-streams --common.lang eng --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10 --common.name "default_english"
 
-arpac generate-streams --lexicon.no-binary-feature-control --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10  --syllable.syllable_alpha 0.5 --common.name "random_german"
+arpac generate-streams --lexicon.no-binary-feature-control --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10  --syllable.syllable_alpha 0.05 --common.name "random_german"
 arpac generate-streams --lexicon.no-binary-feature-control --common.lang eng --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10 --common.name "random_english"
 
 arpac evaluate-lexicons --stream.n-streams-per-lexicon 10 --common.name literature_streams --lexicons \
