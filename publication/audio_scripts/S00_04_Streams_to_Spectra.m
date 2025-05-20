@@ -7,7 +7,7 @@ close all
 
 % Load stimuli
 project_dir = '/data/u_titone_thesis/PhD_Leipzig/01_Projects/01_Artificial_Lexicon';
-stimuli_dir = [project_dir filesep '01_Stimuli' filesep '03_Streams'];
+stimuli_dir = [project_dir filesep '01_Stimuli' filesep '04_Streams'];
 sound_files = dir(fullfile(stimuli_dir, 'TP*.wav'));
 
 % Experimental parameters
@@ -33,7 +33,7 @@ end
 %% Compute fft and plot
 
 % Loop though conditions, compute FFT and plot
-names = {"TP-random_position-random"; "TP-random_position-fixed"; "TP-structured"};
+names = {"TP-uniform_position-random"; "TP-uniform_position-fixed"; "TP-structured"};
 t = tiledlayout(1, nConds, "TileSpacing", "compact");
 for iCond = 1:nConds
     trl_sound = abs(hilbert(StimSet(iCond, :)));
@@ -57,5 +57,6 @@ end
 title(t, 'Envelope spectra', 'FontSize', 14, 'FontWeight', 'bold', 'FontName', 'Arial')
 xlabel(t, 'f (Hz)', 'FontSize', 12, 'FontWeight', 'normal', 'FontName', 'Arial')
 ylabel(t, '|P(f)|', 'FontSize', 12, 'FontWeight', 'normal', 'FontName', 'Arial')
-f_out = fullfile(project_dir, "03_Figures/titone_Spectra_results_v3.tiff");
-exportgraphics(gcf, f_out, 'Resolution', 600)
+f_out = fullfile(project_dir, "03_Figures/titone_spectra_results_v4.tiff");
+exportgraphics(gcf, f_out, 'ContentType', 'vector', 'Resolution', 600)
+saveas(gcf, f_out, 'svg')

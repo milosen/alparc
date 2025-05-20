@@ -72,6 +72,7 @@ def write_stream_summary(streams: Register, save_path: str, logger: logging.Logg
 
 @dataclass
 class CommonArgs:
+    """"""
     lang: Literal["deu", "eng"] = "deu"
     """The reference language to use (mainly for corpora)"""
     log_dir: Union[str, os.PathLike] = "results"
@@ -86,63 +87,94 @@ class CommonArgs:
 @dataclass
 class SyllableArgs:
     phoneme_pattern: str = "cV"
+    """Phoneme pattern to use for syllable generation."""
     unigram_control: bool = True
+    """Control for phoneme frequency of use in the syllable compared to the reference language"""
     unigram_alpha: Optional[float] = None
+    """Threshold for phoneme frequency of use in the syllable"""
     syllable_control: bool = True
+    """Control for syllable frequency of use in the syllable compared to the reference language"""
     syllable_alpha: Optional[float] = None
+    """Threshold for syllable frequency of use in the syllable"""
     export_ssml: bool = False
+    """Export syllables to SSML format, e.g. for audio generation"""
     consonant_features: List[TypePhonemeFeatureLabels] = field(default_factory=lambda: LABELS_C)
+    """Consonant features to use for controls in syllable generation"""
     vowel_features: List[TypePhonemeFeatureLabels] = field(default_factory=lambda: LABELS_V)
+    """Vowel features to use for controls in syllable generation"""
 
 @dataclass
 class WordArgs:
-    n_syllables_per_word: int = 3
-    bigram_control: bool = True
-    bigram_alpha: Optional[float] = None
-    trigram_control: bool = True
-    trigram_alpha: Optional[float] = None
-    positional_control: bool = True
-    positional_control_position: Optional[int] = None
-    position_alpha: int = 0
-    phonotactic_control: bool = True
-    n_look_back: int = 2
     n_words: int = 10000
+    """Number of words to generate"""
+    n_syllables_per_word: Literal[2, 3, 4] = 3
+    """Number of syllables per word"""
+    bigram_control: bool = True
+    """Control for bigram frequency of use in the word compared to the reference language"""
+    bigram_alpha: Optional[float] = None
+    """Threshold for bigram frequency of use in the word"""
+    trigram_control: bool = True
+    """Control for trigram frequency of use in the word compared to the reference language"""
+    trigram_alpha: Optional[float] = None
+    """Threshold for trigram frequency of use in the word"""
+    positional_control: bool = True
+    """Control for positional frequency of use of a phoneme in the word compared to the reference language"""
+    positional_control_position: Optional[int] = None
+    """Position of the phoneme in the word (0 = first, 1 = second, ...). If None, all positions are controlled"""
+    position_alpha: int = 0
+    """Threshold for positional frequency of use of a phoneme in the word"""
+    phonotactic_control: bool = True
+    """Control for phonotactic feature repetition of the phonemes in the word"""
+    n_look_back: int = 2
+    """Number of phonemes to look back for phonotactic control"""
     max_tries: int = 100000
+    """Maximum number of tries to generate the word register with the given constraints"""
 
 @dataclass
 class LexiconArgs:
     n_lexicons: int = 2
-    n_words_per_lexicon: int = 4
+    """Number of lexicons to generate"""
+    n_words_per_lexicon: Literal[3, 4, 5] = 4
+    """Number of words per lexicon"""
     unique_words: bool = False
+    """Check uniqueness of words across all lexicons"""
     binary_feature_control: bool = True
     """Control for binary feature repetition between words in the lexicon. 
     See 'lag_of_interest', 'max_overlap', and 'max_word_matrix'."""
     lag_of_interest: int = 1
-    """binary feature frequency in words"""
+    """Binary feature frequency in words"""
     max_overlap: int = 1
+    """Maximum number of overlapping features between words in the lexicon"""
     max_word_matrix: int = 200
-    """maximum number of words to use to create pairwise feature overlaps. Will be sub-sampled)"""
+    """Maximum number of words to use to create pairwise feature overlaps (Will be sub-sampled if necessary)"""
     control_features: List[TypePhonemeFeatureLabels] = field(default_factory=lambda: LABELS_C + LABELS_V)
-    """If controlled, which binary features to ignore in binary feature control"""
+    """If controlled, which binary features to include in binary feature control"""
 
 @dataclass
 class StreamArgs:
-    stream_length: int = 32
+    repetitions: int = 15
+    """Number of repetitions of the lexicon contents to create a full stream"""
     max_rhythmicity: Optional[float] = None
+    """Threshold for maximum rhythmicity index of features in the stream. If None, rhythmicity control is still applied, but no threshold"""
     n_streams_per_lexicon: int = 2
+    """Number of streams to generate per lexicon"""
     max_tries_randomize: int = 10
+    """Maximum number of tries to randomize the stream (only if max_rhythmicity is used)"""
     tp_modes: List[Literal["random", "word_structured", "position_controlled"]] = field(default_factory=lambda: ["random", "word_structured", "position_controlled"])
+    """Rules to use for the syllable randomization. If None, all patterns are used"""
     require_all_tp_modes: bool = True
+    """If True, all tp_modes are required to return a valid stream for a given lexicon, otherwise the stream will be dropped"""
 
 @dataclass
-class GenerateStreams:
+class Generate:
+    """Generate a dataset of streams from a phenome database and language-specific phoneme, syllable and n-gram corpora"""
     common: CommonArgs
     syllable: SyllableArgs
     word: WordArgs
     lexicon: LexiconArgs
     stream: StreamArgs
 
-def generate_stream_dataset(args: GenerateStreams) -> RegisterType:
+def generate_stream_dataset(args: Generate) -> RegisterType:
     logger, log_dir = setup_logging(args.common.log_dir, args.common.log_console, name=args.common.name or "generate_streams")
     
     with open(os.path.join(log_dir, "config.yml"), "w") as file:
@@ -216,7 +248,7 @@ def generate_stream_dataset(args: GenerateStreams) -> RegisterType:
         for stream in make_streams(
             lexicons,
             max_rhythmicity=args.stream.max_rhythmicity,
-            stream_length=args.stream.stream_length,
+            stream_length=args.stream.repetitions,
             max_tries_randomize=args.stream.max_tries_randomize,
             tp_modes=args.stream.tp_modes,
             require_all_tp_modes=args.stream.require_all_tp_modes
@@ -237,19 +269,23 @@ def write_lexicon_summary(lexicon: Register, save_path: str, logger: logging.Log
 
 
 @dataclass
-class EvaluateLexicons:
+class Diagnose:
+    """Diagnose a lexicon by checking its phonotactic, acoustic and rhythmic properties"""
     lexicons: str
     """Lexicon string(s) consisting of words and syllables. Multiple lexicons should be separated by ' '.
     Syllables should be separated by '|' and words by '||'. Example: pi|ɾu|ta||ba|ɡo|li||to|ku|da||ɡu|haɪ|bo"""
     common: CommonArgs
     stream: StreamArgs
     export_ssml: bool = True
+    """Export syllables to SSML format, e.g. for audio generation"""
     split_registers: bool = False
     """Derive phoneme and syllable registers from the lexicon"""
     generate_streams: bool = True
+    """Generate streams from the parsed lexicons"""
     phoneme_pattern: str = "cv"
+    """Phoneme pattern to assume for syllable parsing"""
 
-def evaluate_lexicons(args: EvaluateLexicons):
+def evaluate_lexicons(args: Diagnose):
     logger, log_dir = setup_logging(args.common.log_dir, args.common.log_console, name=args.common.name or "evaluate_lexicon")
 
     with open(os.path.join(log_dir, "config.yml"), "w") as file:
@@ -277,7 +313,7 @@ def evaluate_lexicons(args: EvaluateLexicons):
             for stream in make_streams(
                 lexicons,
                 max_rhythmicity=args.stream.max_rhythmicity,
-                stream_length=args.stream.stream_length,
+                stream_length=args.stream.repetitions,
                 max_tries_randomize=args.stream.max_tries_randomize,
                 tp_modes=args.stream.tp_modes,
                 require_all_tp_modes=args.stream.require_all_tp_modes
@@ -319,9 +355,10 @@ class EvaluateStream:
     """Stream string consisting of syllables, separated by '|'. 
     Example: pi|ɾu|ta|ba|ɡo|li|to|li|to|ku|ɾu|ta|ba|ɡo|li|to|ku|da|ɡu|ki|bo"""
 
+
 def cli():
-    args = tyro.cli(Union[GenerateStreams, EvaluateLexicons])
-    if isinstance(args, GenerateStreams):
+    args = tyro.cli(Union[Generate, Diagnose], prog="alparc", description="The ALPARC Toolbox: Artificial Languages with Phonological and Acoustic Rhythmicity Control")
+    if isinstance(args, Generate):
         generate_stream_dataset(args)
-    if isinstance(args, EvaluateLexicons):
+    if isinstance(args, Diagnose):
         evaluate_lexicons(args)

@@ -1,11 +1,14 @@
 #!/bin/bash
 
-arpac generate-streams --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10  --syllable.syllable_alpha 0.05 --common.name "default_german"
-arpac generate-streams --common.lang eng --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10 --common.name "default_english"
+# defaults
+arpac generate-streams --common.name "default_german" --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10  --syllable.syllable_alpha 0.05
+arpac generate-streams --common.name "default_english" --common.lang eng --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10 --syllable.phoneme_pattern cv
 
-arpac generate-streams --lexicon.no-binary-feature-control --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10  --syllable.syllable_alpha 0.05 --common.name "random_german"
-arpac generate-streams --lexicon.no-binary-feature-control --common.lang eng --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10 --common.name "random_english"
+# random lexicons
+arpac generate-streams --common.name "random_german" --lexicon.no-binary-feature-control --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10  --syllable.syllable_alpha 0.05
+arpac generate-streams --common.name "random_english" --lexicon.no-binary-feature-control --common.lang eng --lexicon.n-lexicons 21 --stream.n-streams-per-lexicon 10 --syllable.phoneme_pattern cv
 
+# lexicons from the literature
 arpac evaluate-lexicons --stream.n-streams-per-lexicon 10 --common.name literature_streams --lexicons \
 "pi|ɾu|ta||ba|ɡo|li||to|ku|da||ɡu|ki|bo \
 pa|be|la||di|ne|ka||lu|fa|ri||xi|so|du \

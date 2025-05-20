@@ -9,7 +9,7 @@ where = ["src"]
 arpac = ["data/*"]
 
 [project]
-name = "arpac"
+name = "alparc"
 version = "0.0.1"
 authors = [
   { name="Nikola Milosevic", email="milose.nik@gmail.com" },
@@ -32,8 +32,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/pypa/sampleproject"
-Issues = "https://github.com/pypa/sampleproject/issues"
+Homepage = "https://github.com/milosen/alparc"
+Issues = "https://github.com/milosen/alparc/issues"
 
 [project.optional-dependencies]
 test = [
@@ -41,4 +41,4 @@ test = [
 ]
 
 [project.scripts]
-arpac = "arpac:cli.cli"
+alparc = "arpac:cli.cli"
