@@ -5,12 +5,12 @@ This is code for our work [The ALPARC Toolbox: Artificial Languages with Phonolo
 The following describes how you can set up the software and run the experiments from the paper.
 
 ### Install Package
-The simplest is to clone this repository and install ARC in editable mode:
+The simplest is to clone this repository and install ALPARC in editable mode:
 ```shell
 pip install -e .
 ```
 
-If you want to use ARC as a package, you can install it directly from git with
+If you want to use ALPARC as a package, you can install it directly from git with
 ```shell
 pip install git+https://github.com/milosen/alparc.git
 ```
@@ -35,14 +35,14 @@ and select the notebook you want.
 
 1.  `data_and_stats_from_the_paper.ipynb` reproduces the data for the figures and the appendices of the paper
 2.  `plots_from_the_paper.ipynb` reproduces the figures in the publication
-3.  *Optional*: If you want to adapt ARC to your own research, you'll probably want to take a closer look at ARCs internals. More notebooks on that can be found in the [ALPARC Workshop](https://github.com/milosen/alparc_workshop)
+3.  *Optional*: If you want to adapt ALPARC to your own research, you'll probably want to take a closer look at ALPARCs internals. More notebooks on that can be found in the [ALPARC Workshop](https://github.com/milosen/alparc_workshop)
 
 # Citation
 Please cite our work as
 ```
-@article {Titone2024arc,
+@article {Titone2024ALPARC,
 	author = {Titone, Lorenzo and Milosevic, Nikola and Meyer, Lars},
-	title = {The ARC Toolbox: Artificial Languages with Rhythmicity Control},
+	title = {The ALPARC Toolbox: Artificial Languages with Phonological and Acoustic Rhythmicity Control},
 	elocation-id = {2024.05.24.595268},
 	year = {2024},
 	doi = {10.1101/2024.05.24.595268},
