@@ -36,7 +36,7 @@ and select the notebook you want.
 1.  `publication/data_and_stats_from_the_paper.ipynb` reproduces the data for the figures and the appendices of the paper
 2.  `publication/plots_from_the_paper.ipynb` reproduces the figures in the publication
 3.  *Optional*: If you want to generate or diagnose your own data, please have a look at the tutorial on how to use the command line tool: `workshop/00_basic_command_line_usage.ipynb`. This notebook shows how to use the command line tool `alparc` to generate data and run the analysis. You can also use the command line tool directly from the terminal. The tool can be run with `alparc --help`
-4.  *Optional*: If you want to adapt ALPARC to your own research needs, you'll probably want to take a closer look at the library, or even the internals of the toolbox. More notebooks on that can be found in [ALPARC's Workshop Directory](https://github.com/milosen/alparc_workshop)
+4.  *Optional*: If you want to adapt ALPARC to your own research needs, you'll probably want to take a closer look at the library, or even the internals of the toolbox. More notebooks on that can be found in [ALPARC's Workshop Directory](https://github.com/milosen/alparc/workshop)
 
 # Citation
 Please cite our work as
