@@ -35,7 +35,7 @@ and select the notebook you want.
 
 1.  `data_and_stats_from_the_paper.ipynb` reproduces the data for the figures and the appendices of the paper
 2.  `plots_from_the_paper.ipynb` reproduces the figures in the publication
-3.  *Optional*: If you want to adapt ALPARC to your own research, you'll probably want to take a closer look at ALPARCs internals. More notebooks on that can be found in the [ALPARC Workshop](https://github.com/milosen/alparc_workshop)
+3.  *Optional*: If you want to adapt ALPARC to your own research, you'll probably want to take a closer look at ALPARCs internals. More notebooks on that can be found in the [ALPARC Workshop](https://github.com/milosen/alparc/workshop)
 
 # Citation
 Please cite our work as
