@@ -1,4 +1,4 @@
-# ARC
+# ALPARC
 This is code for our work [The ALPARC Toolbox: Artificial Languages with Phonological and Acoustic Rhythmicity Control](https://doi.org/10.1101/2024.05.24.595268)
 
 ## Setup
