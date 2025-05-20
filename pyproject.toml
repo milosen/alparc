@@ -6,11 +6,11 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-alparc = ["data/*"]
+alparc = ["data/*", "data/english/*", "data/german/*", "data/english/orig/*", "data/german/orig/*"]
 
 [project]
 name = "alparc"
-version = "0.0.2"
+version = "0.0.8"
 authors = [
   { name="Nikola Milosevic", email="milose.nik@gmail.com" },
   { name="Lorenzo Titone"},
@@ -26,7 +26,8 @@ dependencies = [
   "tyro",
   "tqdm",
   "seaborn",
-  "ruamel_yaml",
+  "pandas",
+  "pyyaml",
   "pingouin",
   "pydantic",
 ]
