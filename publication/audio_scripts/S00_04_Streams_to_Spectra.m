@@ -54,9 +54,11 @@ for iCond = 1:nConds
         yticks([])
     end
 end
-title(t, 'Envelope spectra', 'FontSize', 14, 'FontWeight', 'bold', 'FontName', 'Arial')
-xlabel(t, 'f (Hz)', 'FontSize', 12, 'FontWeight', 'normal', 'FontName', 'Arial')
-ylabel(t, '|P(f)|', 'FontSize', 12, 'FontWeight', 'normal', 'FontName', 'Arial')
-f_out = fullfile(project_dir, "03_Figures/titone_spectra_results_v4.tiff");
-exportgraphics(gcf, f_out, 'ContentType', 'vector', 'Resolution', 600)
-saveas(gcf, f_out, 'svg')
+title(t, 'Amplitude modulation spectra', 'FontSize', 14, 'FontWeight', 'bold', 'FontName', 'Arial')
+xlabel(t, 'Frequency (Hz)', 'FontSize', 12, 'FontWeight', 'normal', 'FontName', 'Arial')
+ylabel(t, 'Power spectral density', 'FontSize', 12, 'FontWeight', 'normal', 'FontName', 'Arial')
+f_out = fullfile(project_dir, '03_Figures/titone_spectra_results_v5');
+%exportgraphics(gcf, [f_out '.svg'], 'ContentType', 'vector', 'Resolution', 600)
+saveas(gcf, [f_out '.svg'], 'svg')
+saveas(gcf, [f_out '.pdf'], 'pdf')
+saveas(gcf, [f_out '.tiff'], 'tiff')
