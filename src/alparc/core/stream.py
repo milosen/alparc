@@ -6,19 +6,19 @@ from typing import List, Optional, Literal, Dict, Union
 import logging
 import os
 
-from arpac.io import load_phonemes
-from arpac.types.base_types import Register, RegisterType
-from arpac.types.syllable import Syllable
-from arpac.types.word import WordType, Word
-from arpac.types.lexicon import LexiconType
-from arpac.types.stream import StreamType, Stream
-from arpac.controls.common import get_oscillation_patterns
+from alparc.io import load_phonemes
+from alparc.types.base_types import Register, RegisterType
+from alparc.types.syllable import Syllable
+from alparc.types.word import WordType, Word
+from alparc.types.lexicon import LexiconType
+from alparc.types.stream import StreamType, Stream
+from alparc.controls.common import get_oscillation_patterns
 
-from arpac.core.lexicon import make_lexicon_generator, make_lexicons
-from arpac.core.word import make_words
-from arpac.core.syllable import make_syllables
+from alparc.core.lexicon import make_lexicon_generator, make_lexicons
+from alparc.core.word import make_words
+from alparc.core.syllable import make_syllables
 
-from arpac.controls.common import *
+from alparc.controls.common import *
 
 
 logger = logging.getLogger(__name__)

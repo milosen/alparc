@@ -14,22 +14,22 @@ import json
 
 from tqdm import tqdm
 
-from arpac.core.stream import make_streams
-from arpac.eval import to_lexicon
-from arpac.io import load_phonemes, read_phoneme_corpus, read_syllables_corpus
-from arpac.types.base_types import Register, RegisterType
-from arpac.types.phoneme import TypePhonemeFeatureLabels
-from arpac.types.syllable import LABELS_C, LABELS_V, Syllable
-from arpac.types.word import WordType, Word
-from arpac.types.lexicon import LexiconType
-from arpac.types.stream import StreamType, Stream
-from arpac.controls.common import get_oscillation_patterns
+from alparc.core.stream import make_streams
+from alparc.eval import to_lexicon
+from alparc.io import load_phonemes, read_phoneme_corpus, read_syllables_corpus
+from alparc.types.base_types import Register, RegisterType
+from alparc.types.phoneme import TypePhonemeFeatureLabels
+from alparc.types.syllable import LABELS_C, LABELS_V, Syllable
+from alparc.types.word import WordType, Word
+from alparc.types.lexicon import LexiconType
+from alparc.types.stream import StreamType, Stream
+from alparc.controls.common import get_oscillation_patterns
 
-from arpac.core.lexicon import make_lexicon_generator, make_lexicons
-from arpac.core.word import make_words
-from arpac.core.syllable import make_syllables
+from alparc.core.lexicon import make_lexicon_generator, make_lexicons
+from alparc.core.word import make_words
+from alparc.core.syllable import make_syllables
 
-from arpac.controls.common import *
+from alparc.controls.common import *
 
 _OBJECT_DUMP = "_arpac"
 
@@ -199,7 +199,7 @@ def generate_stream_dataset(args: Generate) -> RegisterType:
     syllables.save(os.path.join(log_dir, _OBJECT_DUMP, "syllables.json"))
 
     if args.syllable.export_ssml:
-        from arpac.io import export_speech_synthesizer
+        from alparc.io import export_speech_synthesizer
         export_speech_synthesizer(syllables, syllables_dir=os.path.join(log_dir, "ssml"))
 
     logger.info(f"Generate Pseudo-Words: ...")
@@ -335,7 +335,7 @@ def evaluate_lexicons(args: Diagnose):
             logger.info(f"Syllables object with corpus stats saved to file: {os.path.join(log_dir, _OBJECT_DUMP, 'syllables_with_corpus_stats.json')}")
 
             if args.export_ssml:
-                from arpac.io import export_speech_synthesizer
+                from alparc.io import export_speech_synthesizer
                 export_speech_synthesizer(syllables, syllables_dir=os.path.join(log_dir, "ssml"))
 
             phonemes = syllables.flatten()

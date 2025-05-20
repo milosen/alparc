@@ -6,14 +6,14 @@ from typing import List, Literal, Optional, Union, TypeVar, Dict, Any
 
 from pydantic import BaseModel
 
-from arpac.types.base_types import Register, RegisterType
-from arpac.types.phoneme import Phoneme, TypePhonemeFeatureLabels
-from arpac.types.base_types import Element
-from arpac.types.syllable import Syllable, SyllableType, LABELS_C, LABELS_V
+from alparc.types.base_types import Register, RegisterType
+from alparc.types.phoneme import Phoneme, TypePhonemeFeatureLabels
+from alparc.types.base_types import Element
+from alparc.types.syllable import Syllable, SyllableType, LABELS_C, LABELS_V
 
-from arpac.io import read_syllables_corpus
+from alparc.io import read_syllables_corpus
 
-from arpac.controls.filter import filter_common_phoneme_syllables, filter_uniform_syllables
+from alparc.controls.filter import filter_common_phoneme_syllables, filter_uniform_syllables
 
 logger = logging.getLogger(__name__)
 

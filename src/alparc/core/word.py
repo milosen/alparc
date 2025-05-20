@@ -7,13 +7,13 @@ import numpy as np
 from pydantic import BaseModel
 from tqdm import tqdm
 
-from arpac.types.base_types import Register, Element, RegisterType
-from arpac.types.phoneme import PHONEME_FEATURE_LABELS, TypePhonemeFeatureLabels
-from arpac.types.syllable import Syllable, SyllableType
-from arpac.types.word import Word, WordType
+from alparc.types.base_types import Register, Element, RegisterType
+from alparc.types.phoneme import PHONEME_FEATURE_LABELS, TypePhonemeFeatureLabels
+from alparc.types.syllable import Syllable, SyllableType
+from alparc.types.word import Word, WordType
 
-from arpac.controls.common import *
-from arpac.controls.filter import filter_bigrams, filter_common_phoneme_words, filter_trigrams
+from alparc.controls.common import *
+from alparc.controls.filter import filter_bigrams, filter_common_phoneme_words, filter_trigrams
 
 
 logger = logging.getLogger(__name__)

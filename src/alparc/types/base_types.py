@@ -3,9 +3,14 @@ from abc import ABC, abstractmethod
 from collections import OrderedDict
 from copy import copy
 from os import PathLike
-from typing import Dict, Any, TypeVar, Union
+from typing import Dict, Any, Type, TypeVar, Union
 
-from arpac.controls.common import *
+import pandas as pd
+
+from alparc.controls.common import *
+from alparc.types.elements import Element
+
+RegisterType = TypeVar("RegisterType", bound="Register")
 
 
 class Register(OrderedDict):
@@ -137,19 +142,3 @@ class Register(OrderedDict):
             if func(element, *args, **kwargs):
                 reg.append(element)
         return reg
-
-class PhonemeRegister(Register):
-    pass
-
-class SyllableRegister(Register):
-    pass
-
-class WordRegister(Register):
-    pass
-
-class Lexicon(WordRegister):
-    pass
-
-class StreamRegister(Register):
-    pass
-

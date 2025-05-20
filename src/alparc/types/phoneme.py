@@ -2,7 +2,7 @@ from typing import Literal, get_args, TypeVar, Dict, Any
 
 from pydantic import BaseModel
 
-from arpac.types.base_types import Element
+from alparc.types.base_types import Element
 
 TypePhonemeFeatureLabels = Literal[
     "syl", "son", "cons", "cont", "delrel", "lat", "nas", "strid", "voi", "sg", "cg", "ant", "cor", "distr", "lab",

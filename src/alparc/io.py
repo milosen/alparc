@@ -13,20 +13,20 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 
-from arpac.phonecodes import phonecodes
-from arpac.types.base_types import Register, RegisterType
+from alparc.phonecodes import phonecodes
+from alparc.types.base_types import Register, RegisterType
 
-from arpac.types.phoneme import PHONEME_FEATURE_LABELS, Phoneme
-from arpac.types.syllable import Syllable
-from arpac.types.word import Word
-from arpac.types.lexicon import Lexicon, LexiconType
-from arpac.types.stream import Stream
+from alparc.types.phoneme import PHONEME_FEATURE_LABELS, Phoneme
+from alparc.types.syllable import Syllable
+from alparc.types.word import Word
+from alparc.types.lexicon import Lexicon, LexiconType
+from alparc.types.stream import Stream
 
 logger = logging.getLogger(__name__)
 
 
 def get_data_path(fname):
-    return importlib_resources.files("arpac") / "data" / fname
+    return importlib_resources.files("alparc") / "data" / fname
 
 
 BINARY_FEATURES_DEFAULT_PATH = get_data_path("phonemes.csv")

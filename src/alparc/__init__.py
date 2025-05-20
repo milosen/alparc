@@ -1,4 +1,4 @@
-from .io import load_phonemes, load_syllables, load_words, load_lexicons, load_streams
+from .io import load_phonemes, load_syllables, load_words, load_lexicons, load_streams, export_speech_synthesizer
 
 from .controls.common import set_seed
 

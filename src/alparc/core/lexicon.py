@@ -7,15 +7,15 @@ from typing import Generator, Iterable, Optional, Set, List
 
 from tqdm import tqdm
 
-from arpac.types.base_types import Register, RegisterType
-from arpac.types.phoneme import PHONEME_FEATURE_LABELS, TypePhonemeFeatureLabels
-from arpac.types.syllable import SyllableType
-from arpac.types.word import WordType, Word
-from arpac.types.lexicon import Lexicon, LexiconType
+from alparc.types.base_types import Register, RegisterType
+from alparc.types.phoneme import PHONEME_FEATURE_LABELS, TypePhonemeFeatureLabels
+from alparc.types.syllable import SyllableType
+from alparc.types.word import WordType, Word
+from alparc.types.lexicon import Lexicon, LexiconType
 
-from arpac.core.word import word_overlap_matrix
+from alparc.core.word import word_overlap_matrix
 
-from arpac.controls.common import *
+from alparc.controls.common import *
 
 logger = logging.getLogger(__name__)
 
@@ -191,7 +191,8 @@ def make_lexicons(
 
         if not has_repeating_words:
             lexicons.append(lexicon)
-            pbar.update(1)
+            if progress_bar:
+                pbar.update(1)
 
         if len(lexicons) >= n_lexicons:
             break

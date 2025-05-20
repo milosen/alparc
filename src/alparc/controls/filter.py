@@ -8,12 +8,12 @@ from typing import Iterable, Dict, Union, Optional
 import numpy as np
 from scipy import stats
 
-from arpac.types.base_types import Register, RegisterType
-from arpac.types.phoneme import Phoneme
-from arpac.types.syllable import Syllable
-from arpac.types.word import Word
+from alparc.types.base_types import Register, RegisterType
+from alparc.types.phoneme import Phoneme
+from alparc.types.syllable import Syllable
+from alparc.types.word import Word
 
-from arpac.io import read_phoneme_corpus, read_bigrams, read_trigrams, IPA_SEG_DEFAULT_PATH, IPA_BIGRAMS_DEFAULT_PATH, \
+from alparc.io import read_phoneme_corpus, read_bigrams, read_trigrams, IPA_SEG_DEFAULT_PATH, IPA_BIGRAMS_DEFAULT_PATH, \
     IPA_TRIGRAMS_DEFAULT_PATH
 
 

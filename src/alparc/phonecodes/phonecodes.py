@@ -16,7 +16,7 @@
    # list known IPA symbols of vowels, consonants.
    # for other tables, see phonecode_tables.py
 '''
-from arpac.phonecodes import phonecode_tables
+from alparc.phonecodes import phonecode_tables
 
 CODES = set(('ipa', 'arpabet', 'xsampa', 'disc', 'callhome'))
 LANGUAGES = set(('eng', 'deu', 'nld', 'arz', 'cmn', 'spa', 'yue', 'lao', 'vie'))

@@ -11,18 +11,18 @@ from copy import copy
 
 import numpy as np
 
-from arpac.io import load_phonemes
-from arpac.types.base_types import Register, RegisterType
+from alparc.io import load_phonemes
+from alparc.types.base_types import Register, RegisterType
 
-from arpac.types.phoneme import PHONEME_FEATURE_LABELS, Phoneme
-from arpac.types.syllable import Syllable
-from arpac.types.word import Word
-from arpac.types.lexicon import LexiconType
-from arpac.types.stream import Stream
+from alparc.types.phoneme import PHONEME_FEATURE_LABELS, Phoneme
+from alparc.types.syllable import Syllable
+from alparc.types.word import Word
+from alparc.types.lexicon import LexiconType
+from alparc.types.stream import Stream
 
-from arpac.core.syllable import LABELS_C, LABELS_V, syllable_from_phonemes
-from arpac.core.word import Word, word_overlap_matrix
-from arpac.core.stream import compute_rhythmicity_index_sylls_stream, get_oscillation_patterns
+from alparc.core.syllable import LABELS_C, LABELS_V, syllable_from_phonemes
+from alparc.core.word import Word, word_overlap_matrix
+from alparc.core.stream import compute_rhythmicity_index_sylls_stream, get_oscillation_patterns
 
 ALL_DEFAULT_PHONEMES = load_phonemes(lang=None)
 SYLLABLE_FEAT_LABELS = [LABELS_C] + [LABELS_V]

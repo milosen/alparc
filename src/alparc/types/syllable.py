@@ -2,8 +2,8 @@ from typing import List, Literal, Optional, Union, TypeVar, Dict, Any
 
 from pydantic import BaseModel
 
-from arpac.types.phoneme import Phoneme
-from arpac.types.base_types import Element
+from alparc.types.phoneme import Phoneme
+from alparc.types.base_types import Element
 
 LABELS_C = ['son', 'back', 'hi', 'lab', 'cor', 'cont', 'lat', 'nas', 'voi']
 LABELS_V = ['back', 'hi', 'lo', 'lab', 'tense', 'long']

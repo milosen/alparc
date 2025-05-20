@@ -4,8 +4,8 @@ from typing import TypeVar, List, Dict, Any, Union
 
 from pydantic import BaseModel
 
-from arpac.types.base_types import Register, Element, RegisterType
-from arpac.types.syllable import Syllable, SyllableType
+from alparc.types.base_types import Register, Element, RegisterType
+from alparc.types.syllable import Syllable, SyllableType
 
 
 StreamType = TypeVar("StreamType", bound="Stream")

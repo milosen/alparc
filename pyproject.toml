@@ -41,4 +41,4 @@ test = [
 ]
 
 [project.scripts]
-alparc = "arpac:cli.cli"
+alparc = "alparc:cli.cli"
