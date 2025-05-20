@@ -10,7 +10,7 @@ alparc = ["data/*"]
 
 [project]
 name = "alparc"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="Nikola Milosevic", email="milose.nik@gmail.com" },
   { name="Lorenzo Titone"},
