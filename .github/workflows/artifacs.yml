@@ -1,0 +1,22 @@
+name: Artefacts Workflow
+
+on: [push]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: generate stream dataset
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          uv sync
+          uv run alparc generate --common.name default_streams
+          tar -cvvf results/default_streams.tar results/default_streams_*
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: default_streams
+          path: |
+            results/default_streams.tar
