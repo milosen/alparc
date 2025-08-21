@@ -1,6 +1,8 @@
 # ALPARC
 ALPARC is a Python package that allows you to generate artificial languages with phonological and acoustic rhythmicity control. It is designed to be used in psycholinguistic experiments, where you want to control the rhythmic properties of the stimuli you present to your participants. 
 
+![info](assets/info.png)
+
 If you find the package useful, please consider citing our work:
 [The ALPARC Toolbox: Artificial Languages with Phonological and Acoustic Rhythmicity Control](https://doi.org/10.1101/2024.05.24.595268)
 
@@ -22,31 +24,53 @@ You can use ALPARC directly as a library for your own python scripts. The packag
 1. **generate new stimuli** for your experiments from scratch, based on natural language statistics, or 
 2. **analyze your existing stimuli**, for example pseudo-words created with [Wuggy](https://github.com/WuggyCode/wuggy).
 
-## Setup
-The following describes how you can set up the software and run the experiments from the paper.
+## Installation
 
-### Install Package
-//TODO: Simplify this section, maybe with a single command that installs everything needed. This could be done using uv.
-
-The simplest is to clone this repository and install ALPARC in editable mode:
+1. Install the environment manager [uv](https://github.com/astral-sh/uv). As of 2025, this is done es follows:
 ```shell
-pip install -e .
+# On macOS and Linux.
+curl -LsSf https://astral.sh/uv/install.sh | sh
+````
+```shell
+# On Windows.
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
-
-If you want to use ALPARC as a package, you can install it directly from git with
+2. Clone this repository:
 ```shell
-pip install git+https://github.com/milosen/alparc.git
+# On macOS and Linux.
+git@github.com:milosen/alparc.git && cd alparc
 ```
-or from the [Python Package Index (PyPI)](https://pypi.org/project/alparc/) with
+2. Install dependencies with uv:
 ```shell
-pip install alparc
+uv sync
 ```
 
 ## Generate new stimuli
-// ToDo: Add a tutorial on how to use ALPARC functions to generate new stimuli
+You can use the `generate` function from the `alparc` package to create new stimuli. This function allows you to specify various parameters, such as the number of stimuli, the phonological and acoustic properties, and more.
 
-## Analyze existing stimuli
-// TODo: Add a tutorial on how to use ALPARC functions to analyze existing stimuli
+In a script or notebook you can use the following code to generate new stimuli:
+```python
+from alparc import generate
+# Example usage for generating streams from scratch
+# This will generate a set of streams with the default parameters.
+# check out the documentation for more options, or run `help(generate)`.
+streams, report = generate()
+# Example usage for generating streams starting with a custom lexicon
+# This will generate a set of streams based on the provided lexicon.
+# The lexicon should be a list of words. Phonemes in the lexicon should be separated by an underscore _ and syllables should be separated by vertical bars |.
+streams, report = generate(words=["k_a|t_a|l_a|n_a", "m_a|r_a|s_a|p_a"], is_lexicon=True)
+# Example usage for generating streams from words
+streams, report = generate(words=["k_a|t_a|l_a|n_a", "m_a|r_a|s_a|p_a"], is_lexicon=False)
+```
+
+## Diagnose existing stimuli
+You can use the `diagnose` function from the `alparc` package to analyze existing stimuli, including your own pseudowords, lexicons, and streams. This function allows you to specify the stimuli you want to analyze and returns various statistics about their phonological and acoustic properties.
+```python
+from alparc import diagnose
+# Example usage
+stimuli, report = diagnose(stimuli=["k_a|t_a|l_a|n_a", "m_a|r_a|s_a|p_a"], is_lexicon=False)
+stimuli, report = diagnose(stimuli="k_a|t_a|l_a|n_a|m_a|r_a|s_a|p_a")
+```
 
 ## Run the code from the paper
 

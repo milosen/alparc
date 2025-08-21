@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+assets/*.key
+notebooks/*.json
 
 # C extensions
 *.so
