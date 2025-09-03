@@ -175,7 +175,7 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-arpac_workspace/
 */results/
 results/
-.vscode/
+.vscode/*
+*.tar.gz
