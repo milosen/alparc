@@ -1,0 +1,32 @@
+name: Artefacts Workflow
+
+on: [push]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: generate stream dataset
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          uv sync
+          cd publication
+          uv run ./generate_all_datasets.sh
+          tar -czf results.tar.gz results/*
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: results
+          path: |
+            results.tar.gz
+      - name: upload linux artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: results.tar.gz
+          asset_name: results.tar.gz
+          asset_content_type: application/gzip

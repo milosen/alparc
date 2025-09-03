@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+assets/*.key
+notebooks/*.json
 
 # C extensions
 *.so
@@ -173,7 +175,7 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-arpac_workspace/
 */results/
 results/
-.vscode/
+.vscode/*
+*.tar.gz

@@ -30,6 +30,8 @@ dependencies = [
   "pyyaml",
   "pingouin",
   "pydantic",
+  "jupyter",
+  "ipykernel",
 ]
 
 [project.urls]
