@@ -15,18 +15,10 @@ jobs:
           cd publication
           uv run ./generate_all_datasets.sh
           tar -czf results.tar.gz results/*
-      - name: Archive production artifacts
+          uv run python stats.py
+      - name: Archive Latest Default Dataset
         uses: actions/upload-artifact@v4
         with:
           name: results
           path: |
-            results.tar.gz
-      - name: upload linux artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: results.tar.gz
-          asset_name: results.tar.gz
-          asset_content_type: application/gzip
+            publication/results.tar.gz

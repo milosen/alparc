@@ -69,6 +69,7 @@ def write_stream_summary(streams: Register, save_path: str, logger: logging.Logg
             logger.info(f"- {stream.id}")
         results["info"] = streams.info
         yaml.dump(results, file, encoding="utf-8")
+        return results
 
 @dataclass
 class CommonArgs:
@@ -174,7 +175,7 @@ class Generate:
     lexicon: LexiconArgs
     stream: StreamArgs
 
-def generate_stream_dataset(args: Generate) -> RegisterType:
+def generate_stream_dataset(args: Generate) -> Tuple[Register, Dict]:
     logger, log_dir = setup_logging(args.common.log_dir, args.common.log_console, name=args.common.name or "generate_streams")
     
     with open(os.path.join(log_dir, "config.yml"), "w") as file:
@@ -257,8 +258,8 @@ def generate_stream_dataset(args: Generate) -> RegisterType:
     
     logger.info(f"Streams: ")
     streams.save(os.path.join(log_dir, _OBJECT_DUMP, f"streams.json"))
-    write_stream_summary(streams, save_path=log_dir, logger=logger)
-
+    report = write_stream_summary(streams, save_path=log_dir, logger=logger)
+    return streams, report
 
 def write_lexicon_summary(lexicon: Register, save_path: str, logger: logging.Logger):
     with open(os.path.join(save_path, "lexicons.yml"), 'w') as file:
