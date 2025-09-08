@@ -84,7 +84,7 @@ class CommonArgs:
     """Log to console"""
     progress_bars: bool = True
     """Show progress bars in console"""
-    lexicon: Optional[List[str]] = None,
+    lexicon: Optional[List[str]] = None
     """Start with this given lexicon."""
 
 @dataclass
@@ -173,11 +173,11 @@ class StreamArgs:
 @dataclass
 class Generate:
     """Generate a dataset of streams from a phenome database and language-specific phoneme, syllable and n-gram corpora"""
-    common: CommonArgs = CommonArgs()
-    syllable: SyllableArgs = SyllableArgs()
-    word: WordArgs = WordArgs()
-    lexicon: LexiconArgs = LexiconArgs()
-    stream: StreamArgs = StreamArgs()
+    common: CommonArgs = field(default_factory=lambda: CommonArgs())
+    syllable: SyllableArgs = field(default_factory=lambda: SyllableArgs())
+    word: WordArgs = field(default_factory=lambda: WordArgs())
+    lexicon: LexiconArgs = field(default_factory=lambda: LexiconArgs())
+    stream: StreamArgs = field(default_factory=lambda: StreamArgs())
 
 def generate_stream_dataset(args: Generate) -> Tuple[Register, Dict]:
     logger, log_dir = setup_logging(args.common.log_dir, args.common.log_console, name=args.common.name or "generate_streams")
@@ -280,8 +280,8 @@ class Diagnose:
     lexicons: str
     """Lexicon string(s) consisting of words and syllables. Multiple lexicons should be separated by ' '.
     Syllables should be separated by '|' and words by '||'. Example: pi|ɾu|ta||ba|ɡo|li||to|ku|da||ɡu|haɪ|bo"""
-    common: CommonArgs = CommonArgs()
-    stream: StreamArgs = StreamArgs()
+    common: CommonArgs = field(default_factory=lambda: CommonArgs())
+    stream: StreamArgs = field(default_factory=lambda: StreamArgs())
     export_ssml: bool = True
     """Export syllables to SSML format, e.g. for audio generation"""
     split_registers: bool = False
