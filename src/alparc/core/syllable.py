@@ -48,7 +48,7 @@ def get_feature_labels(phoneme: Phoneme):
     return LABELS_V
 
 
-def syllable_from_phonemes(phonemes: RegisterType, phoneme_combination: List[str], syll_feature_labels: List[List[str]] = None):
+def syllable_from_phonemes(phonemes: RegisterType, phoneme_combination: List[str]):
     syll_phons = []
     syll_features = []
     for p in phoneme_combination:
@@ -63,7 +63,7 @@ def syllable_from_phonemes(phonemes: RegisterType, phoneme_combination: List[str
     syllable = Syllable(
         id="".join(phoneme_combination), 
         info={"binary_features": syll_features,
-                          "phonotactic_features": add_phonotactic_features(syll_phons)},
+              "phonotactic_features": add_phonotactic_features(syll_phons)},
         phonemes=syll_phons
     )
 
@@ -125,7 +125,7 @@ def make_feature_syllables(
         list_of_combinations.append(phoneme_combination)
 
     for phoneme_combination in list_of_combinations:
-        syllable = syllable_from_phonemes(phonemes, phoneme_combination, syll_feature_labels)
+        syllable = syllable_from_phonemes(phonemes, phoneme_combination)
         syllables_dict[syllable.id] = syllable
 
     new_info = copy(phonemes.info)
@@ -138,31 +138,18 @@ def make_syllables(phonemes: RegisterType, phoneme_pattern: str = "cV",
                    #unigram_control: bool = True,
                    syllable_control: bool = True, 
                    syllable_alpha: Optional[float] = 0.05,
+                   syllables_path: Optional[str] = None,
                    lang: str = "deu",
                    consonant_features: List[TypePhonemeFeatureLabels] = LABELS_C,
                    vowel_features: List[TypePhonemeFeatureLabels] = LABELS_V,) -> RegisterType:
-    """_summary_
-
-    Args:
-        phonemes (RegisterType): A Register of phonemes that will be used as a basis to generate the syllables
-        phoneme_pattern (str, optional): describes how a syllable is structured, e.g. "cV" syllables consist of a single-consonant character and a long vowel. Defaults to "cV".
-        unigram_control (bool, optional): apply statistical control (on the basis of p-val of uniform distribution) to single unigrams. Defaults to True.
-        language_control (bool, optional): apply language specific controls (only german for now) on the syllable level. Defaults to True.
-        language_alpha (Optional[float], optional): which p-value to assume for language based statistical control. Defaults to 0.05.
-        from_format (Literal[&quot;ipa&quot;, &quot;xsampa&quot;], optional): language control will read from a syllable corpus. which format to assume. Defaults to "xsampa".
-        lang (str, optional): which language to use for language controls. Defaults to "deu".
-
-    Returns:
-        RegisterType: The final Register of syllables
-    """
-
+    
     syllables = make_feature_syllables(phonemes, 
                                        phoneme_pattern=phoneme_pattern,
                                        consonant_features=consonant_features,
                                        vowel_features=vowel_features)
 
     if syllable_control:
-        syllable_corpus = read_syllables_corpus(lang=lang)
+        syllable_corpus = read_syllables_corpus(lang=lang, path=syllables_path)
         syllables = syllables.intersection(syllable_corpus)
     
         if syllable_alpha is not None:

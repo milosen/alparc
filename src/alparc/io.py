@@ -118,10 +118,13 @@ def syll_to_ipa(syll, language="deu", from_format="xsampa"):
 
 def read_syllables_corpus(
         lang: str = "deu",
+        path: Optional[str] = None,
 ) -> Register[str, Syllable]:
     logger.info("READ SYLLABLES, FREQUENCIES AND PROBABILITIES FROM CORPUS AND CONVERT SYLLABLES TO IPA")
 
-    if lang == "deu":
+    if path is not None:
+        syllables_corpus_path = path
+    elif lang == "deu":
         syllables_corpus_path: Union[os.PathLike, str] = SYLLABLES_DEFAULT_PATH_DEU_SPECIAL
     elif lang == "eng":
         syllables_corpus_path: Union[os.PathLike, str] = SYLLABLES_DEFAULT_PATH_ENG

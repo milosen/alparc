@@ -27,7 +27,10 @@ from alparc.core.stream import compute_rhythmicity_index_sylls_stream, get_oscil
 ALL_DEFAULT_PHONEMES = load_phonemes(lang=None)
 SYLLABLE_FEAT_LABELS = [LABELS_C] + [LABELS_V]
 
-def to_syllable(syllable, syllable_type="cv"):
+def to_syllable(syllable, syllable_type: Optional[str] = "cv"):
+    if syllable_type is None:
+        return syllable_from_phonemes(ALL_DEFAULT_PHONEMES, syllable)
+    
     says_cv = (syllable_type == "cv")
     says_cV = (syllable_type == "cV")
 
@@ -42,14 +45,14 @@ def to_syllable(syllable, syllable_type="cv"):
                           "All syllables must be of that type.")
     
     if is_diphthong:
-        syllable_obj = syllable_from_phonemes(ALL_DEFAULT_PHONEMES, syllable[:2], SYLLABLE_FEAT_LABELS)
+        syllable_obj = syllable_from_phonemes(ALL_DEFAULT_PHONEMES, syllable[:2])
         syllable_obj.id = syllable
         return syllable_obj
     
     if is_cV:
-        return syllable_from_phonemes(ALL_DEFAULT_PHONEMES, [syllable[:-2], syllable[-2:]], SYLLABLE_FEAT_LABELS)
+        return syllable_from_phonemes(ALL_DEFAULT_PHONEMES, [syllable[:-2], syllable[-2:]])
         
-    return syllable_from_phonemes(ALL_DEFAULT_PHONEMES, syllable, SYLLABLE_FEAT_LABELS)
+    return syllable_from_phonemes(ALL_DEFAULT_PHONEMES, syllable)
 
 def to_word(word, syllable_type="cv"):
     to_syllable_partial = partial(to_syllable, syllable_type=syllable_type)

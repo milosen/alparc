@@ -61,10 +61,10 @@ from alparc import generate
 streams, report = generate()
 # Example usage for generating streams starting with a custom lexicon
 # This will generate a set of streams based on the provided lexicon.
-# The lexicon should be a list of words. Phonemes in the lexicon should be separated by an underscore _ and syllables should be separated by vertical bars |.
-streams, report = generate(words=["k_a|t_a|l_a|n_a", "m_a|r_a|s_a|p_a"], is_lexicon=True)
-# Example usage for generating streams from words
-streams, report = generate(words=["k_a|t_a|l_a|n_a", "m_a|r_a|s_a|p_a"], is_lexicon=False)
+# The lexicon should be a list of words. Phonemes in the lexicon should be separated by an underscore _ and syllables by vertical bars |.
+streams, report = generate(lexicon=["k_a|t_a|l_a|n_a", "m_a|r_a|s_a|p_a"])
+# you can use your own corpus of syllables to perform controls, but you have to prepare it in the right format. Please see `examples/generate_with_custom_corpus.py`. This feature is still experimental.
+streams, report = generate(syllables="path/to/syllables.csv")
 ```
 Run the script with uv or in the environment where you installed `alparc`:
 
@@ -85,8 +85,7 @@ You can use the `diagnose` function from the `alparc` package to analyze existin
 ```python
 from alparc import diagnose
 # Example usage
-stimuli, report = diagnose(stimuli=["k_a|t_a|l_a|n_a", "m_a|r_a|s_a|p_a"], is_lexicon=False)
-stimuli, report = diagnose(stimuli="k_a|t_a|l_a|n_a|m_a|r_a|s_a|p_a")
+stimuli, report = diagnose(lexicon=["k_a|t_a|l_a|n_a", "m_a|r_a|s_a|p_a"])
 ```
 
 ## Run the code from the paper

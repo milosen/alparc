@@ -84,6 +84,8 @@ class CommonArgs:
     """Log to console"""
     progress_bars: bool = True
     """Show progress bars in console"""
+    lexicon: Optional[List[str]] = None,
+    """Start with this given lexicon."""
 
 @dataclass
 class SyllableArgs:
@@ -97,6 +99,8 @@ class SyllableArgs:
     """Control for syllable frequency of use in the syllable compared to the reference language"""
     syllable_alpha: Optional[float] = None
     """Threshold for syllable frequency of use in the syllable"""
+    syllables_path: Optional[str] = None
+    """Path to syllable corpus csv file"""
     export_ssml: bool = False
     """Export syllables to SSML format, e.g. for audio generation"""
     consonant_features: List[TypePhonemeFeatureLabels] = field(default_factory=lambda: LABELS_C)
@@ -169,11 +173,11 @@ class StreamArgs:
 @dataclass
 class Generate:
     """Generate a dataset of streams from a phenome database and language-specific phoneme, syllable and n-gram corpora"""
-    common: CommonArgs
-    syllable: SyllableArgs
-    word: WordArgs
-    lexicon: LexiconArgs
-    stream: StreamArgs
+    common: CommonArgs = CommonArgs()
+    syllable: SyllableArgs = SyllableArgs()
+    word: WordArgs = WordArgs()
+    lexicon: LexiconArgs = LexiconArgs()
+    stream: StreamArgs = StreamArgs()
 
 def generate_stream_dataset(args: Generate) -> Tuple[Register, Dict]:
     logger, log_dir = setup_logging(args.common.log_dir, args.common.log_console, name=args.common.name or "generate_streams")
@@ -190,6 +194,7 @@ def generate_stream_dataset(args: Generate) -> Tuple[Register, Dict]:
         phonemes=phonemes, 
         phoneme_pattern=args.syllable.phoneme_pattern,
         syllable_control=args.syllable.syllable_control,
+        syllables_path=args.syllable.syllables_path,
         syllable_alpha=args.syllable.syllable_alpha,
         lang=args.common.lang,
         consonant_features=args.syllable.consonant_features,
@@ -275,8 +280,8 @@ class Diagnose:
     lexicons: str
     """Lexicon string(s) consisting of words and syllables. Multiple lexicons should be separated by ' '.
     Syllables should be separated by '|' and words by '||'. Example: pi|ɾu|ta||ba|ɡo|li||to|ku|da||ɡu|haɪ|bo"""
-    common: CommonArgs
-    stream: StreamArgs
+    common: CommonArgs = CommonArgs()
+    stream: StreamArgs = StreamArgs()
     export_ssml: bool = True
     """Export syllables to SSML format, e.g. for audio generation"""
     split_registers: bool = False
