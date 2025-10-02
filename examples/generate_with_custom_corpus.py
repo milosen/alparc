@@ -3,6 +3,7 @@ from alparc import generate
 import pandas as pd
 
 # adapt to what your file looks like
+# here we use a CELEX corpus (which we are not allowed to re-distribute)
 df = pd.read_csv("corpus/orig/EFS.CD", delimiter="\\", names=["Syllable", "freq"], usecols=[0, 3])
 
 # phonecodes provides conversion routines to get the ipa phonemes
