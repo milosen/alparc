@@ -12,12 +12,19 @@ The ALPARC Toolbox: Artificial Languages with Phonological and Acoustic Rhythmic
 bioRxiv, 2024.05.24.595268. https://doi.org/10.1101/2024.05.24.595268
 ```
 
+# Quick start
+If you want to immediately jump in with the example notebook, please install the python environment and package manager [uv](https://github.com/astral-sh/uv) and run:
+```bash
+uv run --with jupyter jupyter lab examples/examples.ipynb 
+```
+
 # Use cases
 The package is flexible and allows you to create a wide range of artificial languages with different rhythmic properties. It is based on the principles of phonological and acoustic rhythmicity, which are important for understanding how language is processed in the brain.
 
 Depending on your use case, you can use ALPARC in one of two ways:
 1. **As a dataset**: We have used ALPARC to generate a range of controlled artificial stimuli. You can readily [download the dataset here](https://github.com/milosen/alparc/releases/latest/download/results.tar.gz) and use it for your experiments. This is useful if you want to make sure the rhythmic properties of your stimuli are properly statistically controlled, but don't want to do any coding in python yourself.
 2. **As a library**: You can use ALPARC as a library in your own Python code. This allows you to generate artificial languages with phonological and acoustic rhythmicity controls in a custom manner, and use them in your own experiments. You can use the functions provided by ALPARC either in custom python scripts or in a jupyter notebook.
+
 
 # Usage as a library
 You can use ALPARC directly as a library for your own python scripts. The package provides a range of functions that allow you to create artificial languages with different rhythmic properties. You can use these functions to

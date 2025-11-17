@@ -141,10 +141,6 @@ def read_syllables_corpus(
         if syll_ipa not in syllables_dict or syllables_dict[syll_ipa].info != info:
             syllables_dict[syll_ipa] = Syllable(
                 id=syll_ipa, phonemes=[], info=info, binary_features=[], phonotactic_features=[])
-        else:
-            logger.info(
-                f"Syllable '{syll_ipa}' with conflicting stats {info} != {syllables_dict[syll_ipa].info}."
-            )
 
     return Register(syllables_dict)
 
@@ -169,11 +165,6 @@ def read_bigrams(
         if bigram not in bigrams_dict or bigrams_dict[bigram].info == info:
             # a bigram is not necessarily a syllable but in our type system they are equivalent
             bigrams_dict[bigram] = Syllable(id=bigram, phonemes=[], info=info)
-        else:
-            logger.info(
-                f"Bigram '{bigram}' with conflicting stats {info} != {bigrams_dict[bigram].info}."
-            )
-            # del bigrams_dict[bigram]
 
     return Register(bigrams_dict)
 
@@ -196,10 +187,6 @@ def read_trigrams(
 
         if trigram not in trigrams or trigrams[trigram].info == info:
             trigrams[trigram] = Syllable(id=trigram, phonemes=[], info=info)
-        else:
-            logger.info(
-                f"Trigram '{trigram}' with conflicting stats {info} != {trigrams[trigram].info}."
-            )
 
     return trigrams
 
@@ -220,11 +207,6 @@ def read_default_phonemes() -> Register:
     for phon, features in zip(phons, feats):
         if phon not in phonemes_dict or features == phonemes_dict[phon].info["features"]:
             phonemes_dict[phon] = Phoneme(id=phon, info={"features": features})
-        else:
-            logger.info(
-                f"Phoneme '{phon}' with conflicting "
-                f"feature entries {features} != {phonemes_dict[phon].info['features']}.")
-            # del phonemes_dict[phon]
 
     return Register(phonemes_dict, _info={"phoneme_feature_labels": phoneme_feature_labels})
 
