@@ -2,7 +2,7 @@ import datetime
 from functools import partial
 import logging
 import os
-from typing import Optional, Tuple, Union, List
+from typing import Literal, Optional, Tuple, Union, List
 
 from tqdm import tqdm
 import yaml
@@ -237,7 +237,7 @@ def generate_streams(
 
 def generate(
     # common
-    lang: Optional[str] = DEFAULT_COMMON_LANG,
+    lang: Literal["deu"] = DEFAULT_COMMON_LANG,
     progress_bars: bool = DEFAULT_COMMON_PROGRESS_BARS,
     lexicon: List[str] = DEFAULT_COMMON_LEXICON,
     

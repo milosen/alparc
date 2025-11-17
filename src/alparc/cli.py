@@ -36,7 +36,7 @@ from alparc import *
 @dataclass
 class CommonArgs:
     """"""
-    lang: Literal["deu", "eng"] = DEFAULT_COMMON_LANG
+    lang: Literal["deu"] = DEFAULT_COMMON_LANG
     """The reference language to use (mainly for corpora)"""
     log_dir: Union[str, os.PathLike] = DEFAULT_COMMON_LOG_DIR
     """The base directory to safe logs and results to"""
