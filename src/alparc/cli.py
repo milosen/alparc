@@ -30,144 +30,106 @@ from alparc.core.word import make_words
 from alparc.core.syllable import make_syllables
 
 from alparc.controls.common import *
+from alparc import *
 
-_OBJECT_DUMP = "_arpac"
-
-def setup_log_dir(results_base_dir: str, name="unknown"):
-    results_dir = f"{name}_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
-    results_path = os.path.join(os.path.normpath(results_base_dir), results_dir)
-    os.makedirs(results_path, exist_ok=True)
-    os.makedirs(os.path.join(results_path, _OBJECT_DUMP), exist_ok=True)
-    return results_path
-
-
-def setup_logging(log_dir: Optional[str] = None, log_console: bool = True, name: str = "unnamed_command") -> Tuple[logging.Logger, str]:
-    log_path = setup_log_dir(log_dir, name=name)
-    logging.basicConfig(filename=os.path.join(log_path, "debug.log"), 
-                        encoding='utf-8', level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    logger = logging.getLogger(__name__)
-    if log_console:
-        logger.addHandler(logging.StreamHandler())
-    return logger, log_path
-
-
-def write_stream_summary(streams: Register, save_path: str, logger: logging.Logger):
-    with open(os.path.join(save_path, "streams.yml"), 'w') as file:
-        results = {"streams": {}, "info": {}}
-        results["streams"] = [{
-                "stream_full": "|".join([syllable.id for syllable in stream]),
-                "lexicon": stream.info["lexicon"],
-                "lexicon_info": stream.info["lexicon_info"],
-                "rhythmicity_indexes": stream.info["rhythmicity_indexes"],
-                "stream_tp_mode": stream.info["stream_tp_mode"],
-                "n_syllables_per_word": stream.info["n_syllables_per_word"] if "n_syllables_per_word" in stream.info.keys() else None,
-                "n_look_back": stream.info["n_look_back"] if "n_look_back" in stream.info.keys() else None,
-                "phonotactic_control": stream.info["phonotactic_control"] if "phonotactic_control" in stream.info.keys() else None,
-                "syllables_info": stream.info["syllables_info"] if "syllables_info" in stream.info.keys() else None,
-        } for stream in streams]
-        for stream in streams:
-            logger.info(f"- {stream.id}")
-        results["info"] = streams.info
-        yaml.dump(results, file, encoding="utf-8")
-        return results
 
 @dataclass
 class CommonArgs:
     """"""
-    lang: Literal["deu", "eng"] = "deu"
+    lang: Literal["deu", "eng"] = DEFAULT_COMMON_LANG
     """The reference language to use (mainly for corpora)"""
-    log_dir: Union[str, os.PathLike] = "results"
+    log_dir: Union[str, os.PathLike] = DEFAULT_COMMON_LOG_DIR
     """The base directory to safe logs and results to"""
-    name: Optional[str] = None
+    name: Optional[str] = DEFAULT_COMMON_NAME
     """Name of the experiment or dataset (to name the subdirectory)"""
-    log_console: bool = True
+    log_console: bool = DEFAULT_COMMON_LOG_CONSOLE
     """Log to console"""
-    progress_bars: bool = True
+    progress_bars: bool = DEFAULT_COMMON_PROGRESS_BARS
     """Show progress bars in console"""
-    lexicon: Optional[List[str]] = None
+    lexicon: Optional[List[str]] = DEFAULT_COMMON_LEXICON
     """Start with this given lexicon."""
 
 @dataclass
 class SyllableArgs:
-    phoneme_pattern: str = "cV"
+    phoneme_pattern: str = DEFAULT_SYLLABLE_PHONEME_PATTERN
     """Phoneme pattern to use for syllable generation."""
-    unigram_control: bool = True
+    unigram_control: bool = DEFAULT_SYLLABLE_UNIGRAM_CONTROL
     """Control for phoneme frequency of use in the syllable compared to the reference language"""
-    unigram_alpha: Optional[float] = None
+    unigram_alpha: Optional[float] = DEFAULT_SYLLABLE_UNIGRAM_ALPHA
     """Threshold for phoneme frequency of use in the syllable"""
-    syllable_control: bool = True
+    syllable_control: bool = DEFAULT_SYLLABLE_SYLLABLE_CONTROL
     """Control for syllable frequency of use in the syllable compared to the reference language"""
-    syllable_alpha: Optional[float] = None
+    syllable_alpha: Optional[float] = DEFAULT_SYLLABLE_SYLLABLE_ALPHA
     """Threshold for syllable frequency of use in the syllable"""
-    syllables_path: Optional[str] = None
+    syllables_path: Optional[str] = DEFAULT_SYLLABLE_SYLLABLES_PATH
     """Path to syllable corpus csv file"""
-    export_ssml: bool = False
+    export_ssml: bool = DEFAULT_SYLLABLE_EXPORT_SSML
     """Export syllables to SSML format, e.g. for audio generation"""
-    consonant_features: List[TypePhonemeFeatureLabels] = field(default_factory=lambda: LABELS_C)
+    consonant_features: List[TypePhonemeFeatureLabels] = field(default_factory=lambda: DEFAULT_SYLLABLE_CONSONANT_FEATURES)
     """Consonant features to use for controls in syllable generation"""
-    vowel_features: List[TypePhonemeFeatureLabels] = field(default_factory=lambda: LABELS_V)
+    vowel_features: List[TypePhonemeFeatureLabels] = field(default_factory=lambda: DEFAULT_SYLLABLE_VOWEL_FEATURES)
     """Vowel features to use for controls in syllable generation"""
 
 @dataclass
 class WordArgs:
-    n_words: int = 10000
+    n_words: int = DEFAULT_WORD_N_WORDS
     """Number of words to generate"""
-    n_syllables_per_word: Literal[2, 3, 4] = 3
+    n_syllables_per_word: Literal[2, 3, 4] = DEFAULT_WORD_N_SYLLABLES_PER_WORD
     """Number of syllables per word"""
-    bigram_control: bool = True
+    bigram_control: bool = DEFAULT_WORD_BIGRAM_CONTROL
     """Control for bigram frequency of use in the word compared to the reference language"""
-    bigram_alpha: Optional[float] = None
+    bigram_alpha: Optional[float] = DEFAULT_WORD_BIGRAM_ALPHA
     """Threshold for bigram frequency of use in the word"""
-    trigram_control: bool = True
+    trigram_control: bool = DEFAULT_WORD_TRIGRAM_CONTROL
     """Control for trigram frequency of use in the word compared to the reference language"""
-    trigram_alpha: Optional[float] = None
+    trigram_alpha: Optional[float] = DEFAULT_WORD_TRIGRAM_ALPHA
     """Threshold for trigram frequency of use in the word"""
-    positional_control: bool = True
+    positional_control: bool = DEFAULT_WORD_POSITIONAL_CONTROL
     """Control for positional frequency of use of a phoneme in the word compared to the reference language"""
-    positional_control_position: Optional[int] = None
+    positional_control_position: Optional[int] = DEFAULT_WORD_POSITIONAL_CONTROL_POSITION
     """Position of the phoneme in the word (0 = first, 1 = second, ...). If None, all positions are controlled"""
-    position_alpha: int = 0
+    position_alpha: int = DEFAULT_WORD_POSITION_ALPHA
     """Threshold for positional frequency of use of a phoneme in the word"""
-    phonotactic_control: bool = True
+    phonotactic_control: bool = DEFAULT_WORD_PHONOTACTIC_CONTROL
     """Control for phonotactic feature repetition of the phonemes in the word"""
-    n_look_back: int = 2
+    n_look_back: int = DEFAULT_WORD_N_LOOK_BACK
     """Number of phonemes to look back for phonotactic control"""
-    max_tries: int = 100000
+    max_tries: int = DEFAULT_WORD_MAX_TRIES
     """Maximum number of tries to generate the word register with the given constraints"""
 
 @dataclass
 class LexiconArgs:
-    n_lexicons: int = 2
+    n_lexicons: int = DEFAULT_LEXICON_N_LEXICONS
     """Number of lexicons to generate"""
-    n_words_per_lexicon: Literal[3, 4, 5] = 4
+    n_words_per_lexicon: Literal[3, 4, 5] = DEFAULT_LEXICON_N_WORDS_PER_LEXICON
     """Number of words per lexicon"""
-    unique_words: bool = False
+    unique_words: bool = DEFAULT_LEXICON_UNIQUE_WORDS
     """Check uniqueness of words across all lexicons"""
-    binary_feature_control: bool = True
+    binary_feature_control: bool = DEFAULT_LEXICON_BINARY_FEATURE_CONTROL
     """Control for binary feature repetition between words in the lexicon. 
     See 'lag_of_interest', 'max_overlap', and 'max_word_matrix'."""
-    lag_of_interest: int = 1
+    lag_of_interest: int = DEFAULT_LEXICON_LAG_OF_INTEREST
     """Binary feature frequency in words"""
-    max_overlap: int = 1
+    max_overlap: int = DEFAULT_LEXICON_MAX_OVERLAP
     """Maximum number of overlapping features between words in the lexicon"""
-    max_word_matrix: int = 200
+    max_word_matrix: int = DEFAULT_LEXICON_MAX_WORD_MATRIX
     """Maximum number of words to use to create pairwise feature overlaps (Will be sub-sampled if necessary)"""
-    control_features: List[TypePhonemeFeatureLabels] = field(default_factory=lambda: LABELS_C + LABELS_V)
+    control_features: List[TypePhonemeFeatureLabels] = field(default_factory=lambda: DEFAULT_LEXICON_CONTROL_FEATURES)
     """If controlled, which binary features to include in binary feature control"""
 
 @dataclass
 class StreamArgs:
-    repetitions: int = 15
+    repetitions: int = DEFAULT_STREAM_REPETITIONS
     """Number of repetitions of the lexicon contents to create a full stream"""
-    max_rhythmicity: Optional[float] = None
+    max_rhythmicity: Optional[float] = DEFAULT_STREAM_MAX_RHYTHMICITY
     """Threshold for maximum rhythmicity index of features in the stream. If None, rhythmicity control is still applied, but no threshold"""
-    n_streams_per_lexicon: int = 2
+    n_streams_per_lexicon: int = DEFAULT_STREAM_N_STREAMS_PER_LEXICON
     """Number of streams to generate per lexicon"""
-    max_tries_randomize: int = 10
+    max_tries_randomize: int = DEFAULT_STREAM_MAX_TRIES_RANDOMIZE
     """Maximum number of tries to randomize the stream (only if max_rhythmicity is used)"""
-    tp_modes: List[Literal["random", "word_structured", "position_controlled"]] = field(default_factory=lambda: ["random", "word_structured", "position_controlled"])
+    tp_modes: List[Literal["random", "word_structured", "position_controlled"]] = field(default_factory=lambda: DEFAULT_STREAM_TP_MODES)
     """Rules to use for the syllable randomization. If None, all patterns are used"""
-    require_all_tp_modes: bool = True
+    require_all_tp_modes: bool = DEFAULT_STREAM_REQUIRE_ALL_TP_MODES
     """If True, all tp_modes are required to return a valid stream for a given lexicon, otherwise the stream will be dropped"""
 
 @dataclass
@@ -178,6 +140,23 @@ class Generate:
     word: WordArgs = field(default_factory=lambda: WordArgs())
     lexicon: LexiconArgs = field(default_factory=lambda: LexiconArgs())
     stream: StreamArgs = field(default_factory=lambda: StreamArgs())
+
+@dataclass
+class Diagnose:
+    """Diagnose a lexicon by checking its phonotactic, acoustic and rhythmic properties"""
+    lexicons: str
+    """Lexicon string(s) consisting of words and syllables. Multiple lexicons should be separated by ' '.
+    Syllables should be separated by '|' and words by '||'. Example: pi|ɾu|ta||ba|ɡo|li||to|ku|da||ɡu|haɪ|bo"""
+    common: CommonArgs = field(default_factory=lambda: CommonArgs())
+    stream: StreamArgs = field(default_factory=lambda: StreamArgs())
+    export_ssml: bool = DEFAULT_SYLLABLE_EXPORT_SSML
+    """Export syllables to SSML format, e.g. for audio generation"""
+    split_registers: bool = DEFAULT_DIAGNOSE_SPLIT_REGISTERS
+    """Derive phoneme and syllable registers from the lexicon"""
+    generate_streams: bool = DEFAULT_DIAGNOSE_GENERATE_STREAMS
+    """Generate streams from the parsed lexicons"""
+    phoneme_pattern: str = DEFAULT_DIAGNOSE_PHONEME_PATTERN
+    """Phoneme pattern to assume for syllable parsing"""
 
 def generate_stream_dataset(args: Generate) -> Tuple[Register, Dict]:
     logger, log_dir = setup_logging(args.common.log_dir, args.common.log_console, name=args.common.name or "generate_streams")
@@ -266,31 +245,6 @@ def generate_stream_dataset(args: Generate) -> Tuple[Register, Dict]:
     report = write_stream_summary(streams, save_path=log_dir, logger=logger)
     return streams, report
 
-def write_lexicon_summary(lexicon: Register, save_path: str, logger: logging.Logger):
-    with open(os.path.join(save_path, "lexicons.yml"), 'w') as file:
-        results = {}
-        results["lexicon"] = "|".join(word.id for word in lexicon)
-        results["info"] = lexicon.info
-        yaml.dump(results, file, encoding="utf-8")
-
-
-@dataclass
-class Diagnose:
-    """Diagnose a lexicon by checking its phonotactic, acoustic and rhythmic properties"""
-    lexicons: str
-    """Lexicon string(s) consisting of words and syllables. Multiple lexicons should be separated by ' '.
-    Syllables should be separated by '|' and words by '||'. Example: pi|ɾu|ta||ba|ɡo|li||to|ku|da||ɡu|haɪ|bo"""
-    common: CommonArgs = field(default_factory=lambda: CommonArgs())
-    stream: StreamArgs = field(default_factory=lambda: StreamArgs())
-    export_ssml: bool = True
-    """Export syllables to SSML format, e.g. for audio generation"""
-    split_registers: bool = False
-    """Derive phoneme and syllable registers from the lexicon"""
-    generate_streams: bool = True
-    """Generate streams from the parsed lexicons"""
-    phoneme_pattern: str = "cv"
-    """Phoneme pattern to assume for syllable parsing"""
-
 def evaluate_lexicons(args: Diagnose):
     logger, log_dir = setup_logging(args.common.log_dir, args.common.log_console, name=args.common.name or "evaluate_lexicon")
 
@@ -353,13 +307,6 @@ def evaluate_lexicons(args: Diagnose):
                 phonemes_with_german_corpus_stats = phonemes.intersection(corpus_phonemes)
                 phonemes_with_german_corpus_stats.save(os.path.join(log_dir, _OBJECT_DUMP, "phonemes_with_german_corpus_stats.json"))
                 logger.info(f"Phonemes object with corpus stats saved to file: {os.path.join(log_dir, _OBJECT_DUMP, 'phonemes_with_german_corpus_stats.json')}")
-
-
-@dataclass
-class EvaluateStream:
-    stream: str
-    """Stream string consisting of syllables, separated by '|'. 
-    Example: pi|ɾu|ta|ba|ɡo|li|to|li|to|ku|ɾu|ta|ba|ɡo|li|to|ku|da|ɡu|ki|bo"""
 
 
 def cli():

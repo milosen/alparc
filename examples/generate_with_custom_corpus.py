@@ -4,18 +4,30 @@ import pandas as pd
 
 # adapt to what your file looks like
 # here we use a CELEX corpus (which we are not allowed to re-distribute)
-df = pd.read_csv("corpus/orig/EFS.CD", delimiter="\\", names=["Syllable", "freq"], usecols=[0, 3])
+from alparc.phonecodes import phonecodes
+import csv
+import pandas as pd
+import os
+from alparc.io import CORPUS_DEFAULT_PATH_DEU_SPECIAL
 
-# phonecodes provides conversion routines to get the ipa phonemes
-df["Syllable"] = df["Syllable"].apply(lambda x: phonecodes.disc2ipa(x, L="eng"))
 
-# ALPARC expects these columns
-df = df.set_index("Syllable").rename_axis(index=None)
-df["prob"] = df["freq"]/df.sum()["freq"]
+syllables_corpus_path = os.path.join(CORPUS_DEFAULT_PATH_DEU_SPECIAL, "orig", "syll.txt")
+
+with open(syllables_corpus_path, "r", encoding='utf-8') as csv_file:
+    fdata = list(csv.reader(csv_file, delimiter='\t'))
+
+syllables_dict = {}
+
+for syll_stats in fdata[1:]:
+    syll_ipa = phonecodes.xsampa2ipa(syll_stats[1], language="deu")
+    info = {"freq": int(syll_stats[2]), "prob": float(syll_stats[3])}
+    syllables_dict[syll_ipa] = info  # will overwrite if already present
+
+df = pd.DataFrame.from_dict(syllables_dict, orient="index")
 
 df = df.drop_duplicates()
 
 # for future reference
-df.to_csv("corpus/syllables.csv")
+df.to_csv("results/syllables.csv")
 
-generate(syllables="corpus/syllables.csv")
+generate(syllable_corpus="results/syllables.csv")
