@@ -32,6 +32,7 @@ dependencies = [
   "pydantic",
   "jupyter",
   "ipykernel",
+  "pyzmq>=27.0.1",
 ]
 
 [project.urls]
