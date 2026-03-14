@@ -179,3 +179,5 @@ cython_debug/
 results/
 .vscode/*
 *.tar.gz
+# English corpus data — licence does not permit redistribution
+src/alparc/data/english/

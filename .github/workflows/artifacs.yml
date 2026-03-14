@@ -3,22 +3,35 @@ name: Artefacts Workflow
 on: [push]
 
 jobs:
-  build_and_test:
+  build_artefacts:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: generate stream dataset
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Execute publication notebooks
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          uv sync
-          cd publication
-          uv run ./generate_all_datasets.sh
-          tar -czf results.tar.gz results/*
-          uv run python stats.py
-      - name: Archive Latest Default Dataset
+          uv run --with nbconvert jupyter nbconvert \
+            --to notebook --execute --inplace \
+            publication/data_and_stats_from_the_paper.ipynb
+          uv run --with nbconvert jupyter nbconvert \
+            --to notebook --execute --inplace \
+            publication/plots_from_paper.ipynb
+
+      - name: Package results
+        run: tar -czf results.tar.gz publication/results/
+
+      - name: Upload artefacts
         uses: actions/upload-artifact@v4
         with:
           name: results
           path: |
-            publication/results.tar.gz
+            results.tar.gz
+            publication/data_and_stats_from_the_paper.ipynb
+            publication/plots_from_paper.ipynb
