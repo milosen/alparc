@@ -165,7 +165,7 @@ def _build_lines(stream: Stream, max_cols: int, word_length: Optional[int], star
 
     remaining = len(stream.syllables) - start_at - max_cols
     if remaining > 0:
-        lines.append(pad + f"  … {remaining} more syllables")
+        lines.append(pad + f"Total: {len(stream.syllables)} Syllables. Visualized: [{start_at}, {start_at + max_cols}] ({max_cols} Syllables)")
 
     return lines
 

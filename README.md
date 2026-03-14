@@ -41,6 +41,8 @@ pip install -e .
 
 ## Quick start
 
+More examples including those associated with the paper can be found in `publication/`, and pre-generated datasets can be downloaded from the Releases tab on the right panel.
+
 ### One-line generation
 
 ```python

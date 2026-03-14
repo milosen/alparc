@@ -239,15 +239,19 @@ def generate(
     logger.info("Loaded %d phonemes", len(phonemes))
 
     # 2. Syllables
-    syllables = make_syllables(
-        phonemes,
-        pattern=phoneme_pattern,
-        lang=lang,
-        syllable_control=syllable_control,
-        alpha=syllable_alpha,
-        corpus_path=syllable_corpus,
-    )
-    logger.info("Generated %d syllables", len(syllables))
+    try:
+        syllables = make_syllables(
+            phonemes,
+            pattern=phoneme_pattern,
+            lang=lang,
+            syllable_control=syllable_control,
+            alpha=syllable_alpha,
+            corpus_path=syllable_corpus,
+        )
+        logger.info("Generated %d syllables", len(syllables))
+    except FileNotFoundError:
+        syllables = None
+        logging.warning("Selected lenguage 'eng' but no denglish corpus dataset found. Please make sure to provide one.")
 
     if not syllables:
         raise RuntimeError("No syllables generated — check phoneme pattern and corpus settings.")
