@@ -159,7 +159,7 @@ def generate(
     n_words_per_lexicon: int = 4,
     binary_feature_control: bool = True,
     max_overlap: int = 1,
-    lag_of_interest: int = 1,
+    lag_of_interest: Optional[int] = None,
     max_word_matrix: int = 200,
     unique_words: bool = False,
     # stream stage

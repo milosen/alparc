@@ -23,7 +23,7 @@ def make_lexicon_generator(
     words: Register,
     n_words: int = 4,
     max_overlap: int = 1,
-    lag: int = 1,
+    lag: Optional[int] = None,
     control_features: Optional[List[str]] = None,
     max_yields: int = 1_000_000,
 ) -> Generator[Register, None, None]:
@@ -38,7 +38,8 @@ def make_lexicon_generator(
         words: Register of Word objects.
         n_words: Number of words per lexicon.
         max_overlap: Maximum feature overlap allowed between any word pair.
-        lag: Lag for computing overlap (passed to word_overlap_matrix).
+        lag: Oscillation period in syllables passed to word_overlap_matrix.
+            Defaults to the number of syllables per word.
         control_features: Features to include in overlap computation.
         max_yields: Stop after yielding this many lexicons.
     """
@@ -102,7 +103,7 @@ def make_lexicons(
     n_lexicons: int = 2,
     n_words: int = 4,
     max_overlap: int = 1,
-    lag: int = 1,
+    lag: Optional[int] = None,
     max_word_matrix: int = 200,
     unique_words: bool = False,
     binary_feature_control: bool = True,
@@ -116,7 +117,8 @@ def make_lexicons(
         n_lexicons: How many lexicons to generate.
         n_words: Words per lexicon.
         max_overlap: Max pairwise feature overlap allowed.
-        lag: Lag for overlap calculation.
+        lag: Oscillation period in syllables for overlap calculation (feature pattern matching via convolution).
+            Defaults to the number of syllables per word.
         max_word_matrix: Subsample this many words before building overlap matrix.
         unique_words: Reject lexicons that share words with already-generated ones.
         binary_feature_control: If False, sample randomly (no feature control).

@@ -54,7 +54,7 @@ def test_make_lexicons_overlap_constraint(words):
     max_ov = 1
     lexicons = make_lexicons(words, n_lexicons=3, n_words=4, max_overlap=max_ov)
     for lex in lexicons:
-        ov = word_overlap_matrix(lex, lag=1)
+        ov = word_overlap_matrix(lex)
         # Off-diagonal pairwise overlap should be ≤ max_ov
         n = len(lex)
         for i in range(n):

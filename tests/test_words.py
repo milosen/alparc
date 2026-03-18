@@ -107,21 +107,21 @@ def test_filter_by_position(syllables):
 def test_word_overlap_matrix_shape(words):
     # Use a small subset
     small = words.subset(10)
-    ov = word_overlap_matrix(small, lag=1)
+    ov = word_overlap_matrix(small)
     assert ov.shape == (len(small), len(small))
 
 
 def test_word_overlap_matrix_diagonal(words):
     """Diagonal should be maximum overlap (word with itself)."""
     small = words.subset(5)
-    ov = word_overlap_matrix(small, lag=1)
+    ov = word_overlap_matrix(small)
     for i in range(len(small)):
         assert ov[i, i] >= 0
 
 
 def test_word_overlap_matrix_symmetric(words):
     small = words.subset(8)
-    ov = word_overlap_matrix(small, lag=1)
+    ov = word_overlap_matrix(small)
     np.testing.assert_array_equal(ov, ov.T)
 
 

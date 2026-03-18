@@ -173,7 +173,7 @@ def filter_by_position(
 
 def word_overlap_matrix(
     words: Register,
-    lag: int = 1,
+    lag: Optional[int] = None,
     control_features: Optional[List[str]] = None,
 ) -> np.ndarray:
     """Compute pairwise binary-feature overlap between words.
@@ -183,7 +183,8 @@ def word_overlap_matrix(
 
     Args:
         words: Register of Word objects.
-        lag: Lag in units of word-syllable-length. lag=1 means period = n_syllables.
+        lag: Oscillation period in syllables. Defaults to the number of syllables
+            per word.
         control_features: Which feature names to include. Defaults to all features
             listed in words.info['syllables_info']['syllable_feature_labels'].
 
@@ -192,7 +193,7 @@ def word_overlap_matrix(
     """
     n_words = len(words)
     n_sylls = len(words[0].syllables)
-    oscillation_patterns = get_oscillation_patterns(n_sylls * lag)
+    oscillation_patterns = get_oscillation_patterns(n_sylls if lag is None else lag)
 
     # Determine which feature indices to include
     feat_labels_nested = words.info["syllables_info"]["syllable_feature_labels"]
