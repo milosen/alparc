@@ -1,31 +1,31 @@
-stage,parameter,default
-syllable,lang,deu
-syllable,phoneme_pattern,cV
-syllable,syllable_control,True
-syllable,syllable_alpha,0.05
-syllable,syllable_corpus,None
-word,n_syllables_per_word,3
-word,n_words,10000
-word,max_word_tries,100000
-word,phonotactic_control,True
-word,n_look_back,2
-word,bigram_control,True
-word,bigram_alpha,None
-word,trigram_control,True
-word,trigram_alpha,None
-word,positional_control,True
-word,positional_position,None
-word,position_alpha,0.0
-lexicon,n_lexicons,2
-lexicon,n_words_per_lexicon,4
-lexicon,binary_feature_control,True
-lexicon,max_overlap,1
-lexicon,lag_of_interest,1
-lexicon,max_word_matrix,200
-lexicon,unique_words,False
-stream,n_repetitions,15
-stream,n_streams_per_lexicon,2
-stream,tp_modes,"random,word_structured,position_controlled"
-stream,max_rhythmicity,None
-stream,max_tries_randomize,10
-stream,require_all_tp_modes,True
+stage;parameter;default;alternatives;description / rationale
+syllable;lang;deu;eng;deu uses the German corpus that comes with ALPARC.
+syllable;phoneme_pattern;cV;cv, cvc;The phoneme pattern of building syllables. The default is a common phoneme combination in German.
+syllable;syllable_control;True;False;Syllable control is used in the main demonstration.
+syllable;syllable_alpha;0.05;0, 0.1, etc.;Quantile for filtering out unlikely syllables (based on the corpus)
+syllable;syllable_corpus;None;path-to-syllables.csv;None means use the default corpus.
+word;n_syllables_per_word;3;2, 5, etc.;The default is used in the experiments.
+word;n_words;10000;4000, 5000, etc.;Used in the demonstration. Should be large enough.
+word;max_word_tries;100000;10000, 20000, etc.;Used in the demonstration. Should be large enough.
+word;phonotactic_control;True;False;Used in the demonstration.
+word;n_look_back;2;3, 4, etc.;Used in the demonstration. Larger values provide stricter controls but are computationally more expensive.
+word;bigram_control;True;False;Check that bigram appears in the corpus…
+word;bigram_alpha;None;0.5;… and filter out unlikely ones based on this quantile (no filter if None)
+word;trigram_control;True;False;See bigrams
+word;trigram_alpha;None;0.5;See bigrams
+word;positional_control;True;False;Same as pi-/trigrams but check for likelihood of phoneme placement within a word
+word;positional_position;None;1, 2, etc.;None means check all positions
+word;position_alpha;None;0.5;Don’t filter out unlikely ones (see bigrams and trigrams)
+lexicon;n_lexicons;2;5, 10, etc.;How many lexicons to generate from the word register. Arbitrary.
+lexicon;n_words_per_lexicon;4;3, 5, etc.;Arbitrary. We choose 4 for the demonstration to obtain tractable lexicon lengths for printing.
+lexicon;binary_feature_control;True;False;Can be turned off for comparison, but its one of ALPARCs main features.
+lexicon;max_overlap;1;2, 3, etc.;Reject lexicons with too much feature overlap between words. By default, we don’t allow any overlap, so PRI stays small.
+lexicon;lag;None;1, 2, 3, etc.;Feature similarity score is based on this syllable frequency. Number of syllables per word by default.
+lexicon;max_word_matrix;200;100, 150, etc.;Samples this many words and computes feature overlap matrix between them. Should be large enough. Too large and the computation can get expensive.
+lexicon;unique_words;False;True;Reject lexicons that share words with already-generated ones. Only applicable if multiple lexicons are generated at the same time.
+stream;n_repetitions;15;10, 20, etc.;The number of syllables in the stream will be at least n_syllables_per_word*n_words_per_lexicon. This is one repetition.
+stream;n_streams_per_lexicon;2;5, 10, etc.;Generate this many streams with the same lexicon. Used for the demonstration. 
+stream;tp_modes;random,word_structured,position_controlled;;Used in the experiments to demonstrate the different TP modes.
+stream;max_rhythmicity;None;0.1, 0.5, etc.;Reject streams that have too high PRI. Not done by default to show the full unaltered distribution of ALPARC generated streams.
+stream;max_tries_randomize;10;5, 20, etc.;Only relevant if streams are rejected because of max_rhythmicity. Will try again this many times.
+stream;require_all_tp_modes;True;;Reject all streams from those lexicons that fail to generate all tp_modes. Used only for the demonstration so we can compare streams from all tp_modes on the same lexicon. Only relevant with max_rhythmicity, so when streams can be rejected.
