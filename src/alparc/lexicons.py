@@ -4,7 +4,7 @@ import logging
 import math
 import random
 from copy import copy
-from typing import Generator, List, Optional
+from typing import Generator, List, Optional, Union
 
 import numpy as np
 from tqdm import tqdm

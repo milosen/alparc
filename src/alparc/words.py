@@ -2,7 +2,7 @@
 import logging
 import random
 from copy import copy
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import numpy as np
 from tqdm import tqdm
@@ -173,7 +173,7 @@ def filter_by_position(
 
 def word_overlap_matrix(
     words: Register,
-    lag: Optional[int] = None,
+    lag: Union[int, List[int], None] = None,
     control_features: Optional[List[str]] = None,
 ) -> np.ndarray:
     """Compute pairwise binary-feature overlap between words.
@@ -183,8 +183,11 @@ def word_overlap_matrix(
 
     Args:
         words: Register of Word objects.
-        lag: Oscillation period in syllables. Defaults to the number of syllables
-            per word.
+        lag: Controls the oscillation patterns used for overlap detection.
+            - None (default): period = number of syllables per word.
+            - int: oscillation period in syllables.
+            - List[int]: custom kernel of length 2 * n_syllables, used directly
+              as the oscillation pattern.
         control_features: Which feature names to include. Defaults to all features
             listed in words.info['syllables_info']['syllable_feature_labels'].
 
@@ -193,7 +196,15 @@ def word_overlap_matrix(
     """
     n_words = len(words)
     n_sylls = len(words[0].syllables)
-    oscillation_patterns = get_oscillation_patterns(n_sylls if lag is None else lag)
+    if isinstance(lag, list):
+        expected_len = 2 * n_sylls
+        if len(lag) != expected_len:
+            raise ValueError(
+                f"Custom kernel must have length 2 * n_syllables = {expected_len}, got {len(lag)}."
+            )
+        oscillation_patterns = [lag]
+    else:
+        oscillation_patterns = get_oscillation_patterns(n_sylls if lag is None else lag)
 
     # Determine which feature indices to include
     feat_labels_nested = words.info["syllables_info"]["syllable_feature_labels"]
