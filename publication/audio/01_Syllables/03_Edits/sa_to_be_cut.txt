@@ -1,1 +1,0 @@
-<phoneme alphabet="ipa" ph="saː">sahn</phoneme>

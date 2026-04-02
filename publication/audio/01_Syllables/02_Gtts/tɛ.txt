@@ -1,1 +1,0 @@
-<phoneme alphabet="ipa" ph="tɛː">tä</phoneme>
