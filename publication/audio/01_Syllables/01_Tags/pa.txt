@@ -1,0 +1,1 @@
+<phoneme alphabet="ipa" ph="paː">pa</phoneme>

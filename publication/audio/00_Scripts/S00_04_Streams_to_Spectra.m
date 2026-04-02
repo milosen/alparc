@@ -7,7 +7,7 @@ close all
 
 % Load stimuli
 project_dir = '/data/u_titone_thesis/PhD_Leipzig/01_Projects/01_Artificial_Lexicon';
-stimuli_dir = [project_dir filesep '01_Stimuli' filesep '04_Streams'];
+stimuli_dir = [project_dir filesep '01_Stimuli' filesep '03_Streams'];
 sound_files = dir(fullfile(stimuli_dir, 'TP*.wav'));
 
 % Experimental parameters
@@ -33,14 +33,14 @@ end
 %% Compute fft and plot
 
 % Loop though conditions, compute FFT and plot
-names = {"TP-uniform_position-random"; "TP-uniform_position-fixed"; "TP-structured"};
+names = {"TP-random_position-random"; "TP-random_position-fixed"; "TP-structured"};
 t = tiledlayout(1, nConds, "TileSpacing", "compact");
 for iCond = 1:nConds
     trl_sound = abs(hilbert(StimSet(iCond, :)));
     trl_freqs = fft(trl_sound, nChunk);
     trl_power = abs(trl_freqs/ nChunk);
     trl_power = trl_power(1:nChunk/2+1);
-    trl_power(2:end-1) = 2*trl_power(2:end-1);
+    trl_power(2:end-1) = trl_power(2:end-1).^2;
     nexttile
     plot(nFreqs, trl_power, 'black-')
     xlim([0 5])
@@ -54,11 +54,8 @@ for iCond = 1:nConds
         yticks([])
     end
 end
-title(t, 'Amplitude modulation spectra', 'FontSize', 14, 'FontWeight', 'bold', 'FontName', 'Arial')
-xlabel(t, 'Frequency (Hz)', 'FontSize', 12, 'FontWeight', 'normal', 'FontName', 'Arial')
-ylabel(t, 'Power spectral density', 'FontSize', 12, 'FontWeight', 'normal', 'FontName', 'Arial')
-f_out = fullfile(project_dir, '03_Figures/titone_spectra_results_v5');
-%exportgraphics(gcf, [f_out '.svg'], 'ContentType', 'vector', 'Resolution', 600)
-saveas(gcf, [f_out '.svg'], 'svg')
-saveas(gcf, [f_out '.pdf'], 'pdf')
-saveas(gcf, [f_out '.tiff'], 'tiff')
+title(t, 'Envelope spectra', 'FontSize', 14, 'FontWeight', 'bold', 'FontName', 'Arial')
+xlabel(t, 'f (Hz)', 'FontSize', 12, 'FontWeight', 'normal', 'FontName', 'Arial')
+ylabel(t, '|P(f)|', 'FontSize', 12, 'FontWeight', 'normal', 'FontName', 'Arial')
+f_out = fullfile(project_dir, "03_Figures/titone_Spectra_results_v3.tiff");
+exportgraphics(gcf, f_out, 'Resolution', 600)

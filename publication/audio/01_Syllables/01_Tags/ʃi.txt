@@ -1,0 +1,1 @@
+<phoneme alphabet="ipa" ph="ʃiː">schi</phoneme>
